@@ -1,0 +1,135 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>【読書メモ】The Art Of Unit Testing 2nd Edition - Chap3～Chap5 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">【読書メモ】The Art Of Unit Testing 2nd Edition - Chap3～Chap5</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2019-12-18">2019-12-18</time> </span><span>閲覧時間&#58; 4 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><a href="https://dongsu.dev/2019/12/08/aout2/chap2/">前回</a>までは単体テストとは何か、必要性、そしてテストフレームワークについて書きました。</p><p>今回はクラス間の依存に対して、どういうふうに単体テストを行うことについて説明していきたいと思います。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="このコンテンツで扱うこと"><a href="#このコンテンツで扱うこと" class="headerlink" title="このコンテンツで扱うこと"></a>このコンテンツで扱うこと</h3><ul><li>クラス間の依存</li><li>依存性注入</li><li>stubの使い方</li><li>mockの使い方</li></ul><h2 id="クラス間の依存性"><a href="#クラス間の依存性" class="headerlink" title="クラス間の依存性"></a>クラス間の依存性</h2><p>我々が知っている通り、システム作りにおいてクラス同士の<strong>依存</strong>は避けられません。</p><ul><li>例）クラスAからクラスBを呼び出して何かの処理を行う</li></ul><pre><code class="cs">public class Aclass{
+    public srting DoSomething(){
+        var b = new Bclass();
+
+        if (b.Check()){
+            return &quot;OK&quot;;
+        }else{
+            return &quot;NG&quot;;
+        }
+    }
+}
+
+public class Bclass{
+    public bool Check(){
+        bool isOk = false;
+        // なにかの判定処理
+        return isOk;
+    }
+}</code></pre><p>では、このAクラスに対して単体テストするときに、Bクラスも一緒にテストする必要があるか？</p><p>答えはYesでもありNoでもあります。</p><p>矛盾のように聞こえ混乱するかもしれませんので、ちゃんと説明すると、</p><ul><li>我々は<strong>クラスB</strong>の<strong>実行結果</strong>をテストする<strong>必要ありません</strong></li><li>しかし、我々はこの<strong>クラスA</strong>の<strong>実行結果</strong>が<strong>絶対に正しい</strong>ことを<strong>担保</strong>しなければいけません</li></ul><p>そして、このコードはクラス間が密結合であるため、そもそも<strong>クラスAに対して単体テストできません</strong>。<br>このコードを単体テストを行うためには最初にリファクタリングが必要です。</p><h2 id="依存性注入"><a href="#依存性注入" class="headerlink" title="依存性注入"></a>依存性注入</h2><p>依存性注入を説明する前に、密結合と疎結合を説明しなければなりません。</p><h3 id="密結合"><a href="#密結合" class="headerlink" title="密結合"></a>密結合</h3><p>密結合とは、システムの構成要素間の結びつきや互いの依存関係、関連性などが強く、各々の独立性が低い状態のこと。</p><p>さっきの例でいうと<strong>クラスA</strong>の中で<strong>直接クラスBのインスタンスを生成</strong>したことが密結合に繋がります。</p><h3 id="疎結合"><a href="#疎結合" class="headerlink" title="疎結合"></a>疎結合</h3><p>逆に、疎結合とは要素間の結びつきが弱く独立性が高い状態のことを指します。</p><p>クラスAはクラスBを呼び出して処理するときは直接インスタンス生成するのではなく、<strong>インタフェース</strong>を介します。</p><p>では、コードを見ながらリファクタリングしていきましょう。</p><p>※ちなみにコードはサラで書いていますので、細かいミスがあれば大目に見てくださいww</p><p>まずはクラスBのインタフェースを定義します。そのインタフェースをクラスBに実装します。</p><pre><code class="cs">public interface IBclass{
+    bool Check();
+}
+
+public class Bclass : IBclass{
+    public bool Check(){
+        bool isOk = false;
+        // なにかの判定処理
+        return isOk;
+    }
+}</code></pre><p>ここで<a href="https://docs.microsoft.com/ja-jp/aspnet/core/fundamentals/?view=aspnetcore-3.1&tabs=windows" target="_blank" rel="noopener">依存性注入</a>の登場です。</p><p>クラスAではコンストラクタからの依存性注入することによって、インタフェースを介してBclassを呼び出します。</p><pre><code class="cs">public static void Main(string[] args){
+    var b = new Bclass();
+    // クラスBのインスタンスは外から注入
+    // 本来であればなにかのDIフレームワークを使う
+    var a = new Aclass(b);
+    a.DoSamething();
+}
+
+public class Aclass{
+
+    // クラスBのインタフェース
+    private IBclass _bclass;
+
+    // コンストラクタでクラスBのインスタンスは外から生成される
+    public Aclass(IBclass bclass){
+        this._bclass = bclass;
+    }
+
+    public string DoSomething(){
+        if (_bclass.Check()){
+            return &quot;OK&quot;;
+        }else{
+            return &quot;NG&quot;;
+        }
+    }
+}</code></pre><p><code>ASP.NET Core</code> ではデフォルト依存性注入をサポートしています。</p><p>この一連のリファクタリングを通してクラスAとクラスBが疎結合になったところで、<br>クラスAに対して単体テストを行います。</p><h2 id="Fakeオブジェクト"><a href="#Fakeオブジェクト" class="headerlink" title="Fakeオブジェクト"></a>Fakeオブジェクト</h2><p>クラスAの単体テストを行うため、<strong>Fakeオブジェクト</strong>のクラスBを用意する必要あります。<br>Fakeオブジェクトには<strong>stub</strong>と<strong>mock</strong>の2つの定義があります。</p><h3 id="stub"><a href="#stub" class="headerlink" title="stub"></a>stub</h3><p>stubとはSUTの要求に対して、あらかじめ用意した答えを返すオブジェクトのことを言います。</p><p>では、またまたコード書きながらstubについて理解していきましょう。</p><pre><code class="cs">// クラスBのstub
+public class BclassStub : IBclass{
+    public bool WillBeValid { get; set; }
+
+    public bool Check(){
+        return WillBeValid;
+    }
+}
+
+// クラスAの単体テスト
+ [TestFixture]
+public class AclassTest{
+    [Test]
+    public void DoSomething_BclassIsTrue_ReturnOK(){
+        // Arrage
+        var stub = new BclassStub();
+        stub.WillBeValid = true;
+        string expected = &quot;OK&quot;;
+
+        // Act
+        var sut = new Aclass(stub);
+        string result = sut.DoSomething();
+
+        // Assert
+        Assert.AreEqual(expected, result);
+    }
+
+    [Test]
+    public void DoSomething_BclassIsFalse_ReturnNG(){
+        // Arrage
+        var stub = new BclassStub();
+        stub.WillBeValid = false;
+        string expected = &quot;NG&quot;;
+
+        // Act
+        var sut = new Aclass(stub);
+        string result = sut.DoSomething();
+
+        // Assert
+        Assert.AreEqual(expected, result);
+    }
+}
+</code></pre><p>このようにstubを利用して、クラスBを意識しなくてもクラスAの実行結果が正しいことを担保できます。</p><p>stubの特徴をまとめると</p><ul><li>手動でコーディングしなければならない</li><li>処理の細かい動作を把握しないと、適切なstubオブジェクトが書けません</li><li>手動でコーディングしているので、テストケースの失敗する可能性が低い</li></ul><h3 id="mock"><a href="#mock" class="headerlink" title="mock"></a>mock</h3><p>mockもstubと同じく偽物のオブジェクトですが、手動でコーディングするのではなく、<br>mockフレームワークによって自動生成されます。</p><p><code>.NET</code>で有名なmockフレームワークはMoq,NSubstituteなどいろいろありますが、今回はNSubstituteを用いて実装していきたいと思います。</p><pre><code class="cs">// クラスAの単体テスト
+ [TestFixture]
+public class AclassTest{
+    [Test]
+    public void DoSomething_BclassIsTrue_ReturnOK()
+    {
+        // Arrage
+        // インタフェースからクラスBのmockを生成
+        var mock = Substitute.For&lt;IBclass&gt;();
+        // mockの戻り値をセット
+        mock.Check().Returns(true));
+        string expected = &quot;OK&quot;;
+
+        // Act
+        var sut = new Aclass(mock);
+        string result = sut.DoSomething();
+
+        // Assert
+        Assert.AreEqual(expected, result);
+    }
+
+
+    [Test]
+    public void DoSomething_BclassIsFalse_ReturnNG()
+    {
+        // Arrage
+        // インタフェースからクラスBのmockを生成
+        var mock = Substitute.For&lt;IBclass&gt;();
+        // mockの戻り値をセット
+        mock.Check().Returns(false);
+        string expected = &quot;NG&quot;;
+
+        // Act
+        var sut = new Aclass(mock);
+        string result = sut.DoSomething();
+
+        // Assert
+        Assert.AreEqual(expected, result);
+    }
+}</code></pre><p>stubと比べmockは自分でいちからコーディングする必要ありませんので、手軽にFakeオブジェクトを作れます。</p><p>mockの特徴</p><ul><li>mockは簡単、手軽、効率的</li><li>自動生成のため、手動のstubと比べ自分で制御しにくい</li><li>結果を自分で完全に制御できないから、テストケースの失敗する可能性が高い</li></ul><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>今回はクラス間の依存性に対してどうやって単体テストするのかについて説明しました。</p><p>stubとmockをどっちを使ったほうがいいと聞かれても、正直ケース・バイ・ケースとしか答えようがありません。</p><p>私が尊敬する先輩にその質問する、</p><p>「<strong>雰囲気</strong>で使えばいいんじゃない？」という<strong>いい感じ</strong>の答えが帰ってくるくらいですｗｗ</p><p>まぁ、その話はさておき・・・</p><p>単体テストにおいては<strong>正しい一見識</strong>を持つことが非常に大事です。</p><p>間違った考えで単体テストを書いてしまうと、書けば書くほど単体テストのメリットを享受できず、どんどん落胆します。</p><p>最終的に単体テストを書くことを諦めてしまうでしょう。私も一回それで挫折したことがありました。</p><p>私の考えは絶対に正しいであることは担保できませんが、少なくとも私が単体テストに対して悩みに悩んで熟慮した結果、このコンテンツが生まれました。</p><p>もし、何か意見があれば遠慮なくご連絡ください。</p><p>出典</p><p><a href="https://amzn.to/36R0tMt" target="_blank" rel="noopener">The Art of Unit Testing: with examples in C#</a></p><p>コード</p><p><a href="https://github.com/dongsu-iis/ds-TheArtOfUnitTesting/" target="_blank" rel="noopener">Github Repository</a></p></section></article><section class="prev-next card slide-in-right"><a href="/2020/01/23/aout2/conclusion/" class="link prev" title="【読書メモ】The Art Of Unit Testing 2nd Edition - まとめ"><span class="hover-underline-animation">&larr; 【読書メモ】The Art Of Unit Testing 2nd Edition - まとめ</span> </a><a href="/2019/12/08/aout2/chap2/" class="link next" title="【読書メモ】The Art Of Unit Testing 2nd Edition - Chap2"><span class="hover-underline-animation">【読書メモ】The Art Of Unit Testing 2nd Edition - Chap2 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#このコンテンツで扱うこと"><span class="toc-text">このコンテンツで扱うこと</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#クラス間の依存性"><span class="toc-text">クラス間の依存性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#依存性注入"><span class="toc-text">依存性注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#密結合"><span class="toc-text">密結合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#疎結合"><span class="toc-text">疎結合</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Fakeオブジェクト"><span class="toc-text">Fakeオブジェクト</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#stub"><span class="toc-text">stub</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#mock"><span class="toc-text">mock</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#まとめ"><span class="toc-text">まとめ</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

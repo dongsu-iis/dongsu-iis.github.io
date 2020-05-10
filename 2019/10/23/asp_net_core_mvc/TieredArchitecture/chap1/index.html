@@ -1,0 +1,471 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core MVC 階層化アーキテクチャ Chap1 (Repository Patternを実装する) - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core MVC 階層化アーキテクチャ Chap1 (Repository Patternを実装する)</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 10 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p>最近プライベートでバタバタしていて、ブログの更新を疎かになってしまいました。久しぶりに<code>ASP.NET Core MVC</code> のシリーズの続きを書きます。</p><p><a href="https://dongsu.dev/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/">前回</a>まで、<code>ASP.NET Core MVC</code> のScaffoldの機能を用いてCRUD操作のソースコードを自動生成し、仕組みや動きについて解説までしました。</p><p>今回は前回のソースコードに対して本格的に階層化アーキテクチャの実装をしていきたいと思います。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="このコンテンツで扱うこと"><a href="#このコンテンツで扱うこと" class="headerlink" title="このコンテンツで扱うこと"></a>このコンテンツで扱うこと</h3><ul><li>階層化アーキテクチャの説明</li><li>関心の分離の原則</li><li>Repository Patternの実装方法</li></ul><h3 id="開発環境"><a href="#開発環境" class="headerlink" title="開発環境"></a>開発環境</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>3.0.100</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.39.1</td></tr><tr><td>Browser</td><td>Google Chrome 78.0.3904.70</td></tr></tbody></table><h3 id="なぜ階層化アーキテクチャ"><a href="#なぜ階層化アーキテクチャ" class="headerlink" title="なぜ階層化アーキテクチャ"></a>なぜ階層化アーキテクチャ</h3><p>階層化アーキテクチャは決して<code>ASP.NET Core MVC</code>だけ適しているわけではありません。<br>どんなフレームワーク、アプリケーションでも階層化は作り込むべきです。</p><p>階層化アーキテクチャの主たる目的は「責任を明確」「関心の分離」「再利用可能」です。</p><p>そして、階層化アーキテクチャによって各モジュールそれぞれの機能と責務が明確になり、比較的にマシなコードを目指せます。</p><p>なお、人それぞれに階層化アーキテクチャの考え方があり、このコンテンツのやり方は決して絶対的のものではありません。</p><h2 id="前回のおさらい"><a href="#前回のおさらい" class="headerlink" title="前回のおさらい"></a>前回のおさらい</h2><p>前回のプロジェクトフォルダの構成です。</p><p><img src="/images/TieredArchitecture/chap1/2019-10-23-23-59-08.png" alt></p><p>また、Constorollerの実装は以下通りになっています。</p><ul><li><p>CustomersController.cs</p><pre><code class="cs">  public class CustomersController : Controller
+  {
+      private readonly NorthwindContext _context;
+
+      public CustomersController(NorthwindContext context)
+      {
+          _context = context;
+      }
+
+      // GET: Customers
+      public async Task&lt;IActionResult&gt; Index()
+      {
+          return View(await _context.Customers.ToListAsync());
+      }
+
+  // 省略
+  }</code></pre></li><li><p>SuppliersController.cs</p><pre><code class="cs">  public class SuppliersController : Controller
+  {
+      private readonly NorthwindContext _context;
+
+      public SuppliersController(NorthwindContext context)
+      {
+          _context = context;
+      }
+
+      // GET: Suppliers
+      public async Task&lt;IActionResult&gt; Index()
+      {
+          return View(await _context.Suppliers.ToListAsync());
+      }
+
+  // 省略
+  }</code></pre></li></ul><p>見てわかる通り、CustomersControllerとSuppliersControllerの処理ロジックがぼとんど同じです。<br>外部から注入されたNorthwindContextオブジェクトを用いてデータ操作を行います。</p><p>しかし、Controllerの中で直接DbContextを操作するのは決して良い実装ではありません。</p><p>まず、DbContex自体はすべてのテーブルに対して操作出来るため、セキュリティ的に好ましくないうえ、Controllerに余計な責務を課すことでSOLID原則の<strong>単一責務の原則</strong>に反します。</p><p>また、Controllerにデータ操作の責務を課す結果として、<strong>関心の分離</strong>の原則にも反します。</p><h3 id="関心の分離"><a href="#関心の分離" class="headerlink" title="関心の分離"></a>関心の分離</h3><p>データ操作、バリデーションチェック、ビジネスロジックはいずれも関心であり、それらの処理をすべてControllerの中に実装してしまうと、一つのControllerクラスの中で考慮しなければいけないことが多くなります。</p><p>簡単なシステムは問題がそこまで顕在化しませんが、システム機能や規模が増大に従い、プログラムがどんどんスパゲッティコード化し。メンテナンスしにくくなります。</p><p>それでデータ操作する機能を抜き出し、デザインパターンの一つである<strong>Repository Pattern</strong>を用いてコードを改修していきたいと思います。</p><h2 id="Repository-Patternの実装"><a href="#Repository-Patternの実装" class="headerlink" title="Repository Patternの実装"></a>Repository Patternの実装</h2><p>Repositoryを作成する目的として、関心の分離と単一責務もありますが、もうひとつ大事な目的はプログラムの<strong>再利用</strong>です。</p><p>データ操作の処理は頻繁に利用することが想定されるため、Controllerに毎回同じデータ操作するコードを書くのではなく、Repositoryにデータ操作処理を集約します。そうすると、仕様変更で修正が発生してもRepositoryクラスのみ改修で済みます。</p><h3 id="Interfaceの作成"><a href="#Interfaceの作成" class="headerlink" title="Interfaceの作成"></a>Interfaceの作成</h3><p>Modelsのフォルダ配下に<strong>Interface</strong>のフォルダを作成し、Interfaceフォルダの中に以下２つのInterfaceを作成します。</p><ul><li><p>ICustomerRepository.cs</p><pre><code class="cs">  using System.Collections.Generic;
+  using System.Threading.Tasks;
+
+  namespace ds.NorthwindApp.Web.Models.Interface {
+      public interface ICustomerRepository {
+          Task CreateAsync (Customers customer);
+
+          Task UpdateAsync (Customers customer);
+
+          Task DeleteAsync (Customers customer);
+
+          Task&lt;Customers&gt; GetOneAsync (string id);
+
+          Task&lt;IEnumerable&lt;Customers&gt;&gt; GetAllAsync ();
+
+          Task&lt;bool&gt; ExistsAsync (string id);
+      }
+  }</code></pre></li><li><p>ISupplierRepository.cs</p><pre><code class="cs">  using System.Collections.Generic;
+  using System.Threading.Tasks;
+
+  namespace ds.NorthwindApp.Web.Models.Interface {
+      public interface ISupplierRepository {
+          Task CreateAsync (Suppliers supplier);
+
+          Task UpdateAsync (Suppliers supplier);
+
+          Task DeleteAsync (Suppliers supplier);
+
+          Task&lt;Suppliers&gt; GetOneAsync (int id);
+
+          Task&lt;IEnumerable&lt;Suppliers&gt;&gt; GetAllAsync ();
+
+          Task&lt;bool&gt; ExistsAsync (int id);
+      }
+  }</code></pre></li></ul><h3 id="Repositoryの実装"><a href="#Repositoryの実装" class="headerlink" title="Repositoryの実装"></a>Repositoryの実装</h3><p>Modelsのフォルダ配下に<strong>Repository</strong>のフォルダを作成します。</p><p>Repositoryフォルダの中に以下２つのクラスを作成し、先ほどの作成済みのInterfaceを実装します。</p><ul><li><p>CustomerRepository.cs</p><pre><code class="cs">  using System;
+  using System.Collections.Generic;
+  using System.Threading.Tasks;
+  using ds.NorthwindApp.Web.Models.Interface;
+  using Microsoft.EntityFrameworkCore;
+
+  namespace ds.NorthwindApp.Web.Models.Repository {
+      public class CustomerRepository : ICustomerRepository {
+
+          private readonly NorthwindContext db;
+
+          public CustomerRepository (NorthwindContext context) {
+              db = context;
+          }
+
+          public async Task CreateAsync (Customers customer) {
+              if (customer == null) {
+                  throw new ArgumentNullException (&quot;customer&quot;);
+              } else {
+                  await db.Customers.AddAsync (customer);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task UpdateAsync (Customers customer) {
+              if (customer == null) {
+                  throw new ArgumentNullException (&quot;customer&quot;);
+              } else {
+                  db.Customers.Update (customer);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task DeleteAsync (Customers customer) {
+              if (customer == null) {
+                  throw new ArgumentNullException (&quot;customer&quot;);
+              } else {
+                  db.Customers.Remove (customer);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task&lt;Customers&gt; GetOneAsync (string id) {
+              return await db.Customers.FirstOrDefaultAsync (x =&gt; x.CustomerId == id);
+          }
+
+          public async Task&lt;IEnumerable&lt;Customers&gt;&gt; GetAllAsync () {
+              return await db.Customers.ToListAsync ();
+          }
+
+          public async Task&lt;bool&gt; ExistsAsync (string id) {
+              return await db.Customers.AnyAsync (x =&gt; x.CustomerId == id);
+          }
+
+      }
+  }</code></pre></li></ul><ul><li><p>SupplierRepository.cs</p><pre><code class="cs">  using System;
+  using System.Collections.Generic;
+  using System.Threading.Tasks;
+  using ds.NorthwindApp.Web.Models.Interface;
+  using Microsoft.EntityFrameworkCore;
+
+  namespace ds.NorthwindApp.Web.Models.Repository {
+      public class SupplierRepository : ISupplierRepository {
+
+          private readonly NorthwindContext db;
+
+          public SupplierRepository (NorthwindContext context) {
+              db = context;
+          }
+
+          public async Task CreateAsync (Suppliers supplier) {
+              if (supplier == null) {
+                  throw new ArgumentNullException (&quot;supplier&quot;);
+              } else {
+                  await db.Suppliers.AddAsync (supplier);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task UpdateAsync (Suppliers supplier) {
+              if (supplier == null) {
+                  throw new ArgumentNullException (&quot;supplier&quot;);
+              } else {
+                  db.Suppliers.Update (supplier);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task DeleteAsync (Suppliers supplier) {
+              if (supplier == null) {
+                  throw new ArgumentNullException (&quot;supplier&quot;);
+              } else {
+                  db.Suppliers.Remove (supplier);
+                  await db.SaveChangesAsync ();
+              }
+          }
+
+          public async Task&lt;Suppliers&gt; GetOneAsync (int id) {
+              return await db.Suppliers.FirstOrDefaultAsync (x =&gt; x.SupplierId == id);
+          }
+
+          public async Task&lt;IEnumerable&lt;Suppliers&gt;&gt; GetAllAsync () {
+              return await db.Suppliers.ToListAsync ();
+          }
+
+          public async Task&lt;bool&gt; ExistsAsync (int id) {
+              return await db.Suppliers.AnyAsync (x =&gt; x.SupplierId == id);
+          }
+
+      }
+  }</code></pre></li></ul><h3 id="ContorollerからRepositoryの呼び出し"><a href="#ContorollerからRepositoryの呼び出し" class="headerlink" title="ContorollerからRepositoryの呼び出し"></a>ContorollerからRepositoryの呼び出し</h3><p>Repositoryの実装が完了したら、ControllerからDbContext直接呼出しではなく、Repository経由でデータ操作をするように修正します。</p><ul><li>CustomersController.cs</li></ul><pre><code class="cs">using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ds.NorthwindApp.Web.Models;
+using ds.NorthwindApp.Web.Models.Interface;
+
+namespace ds.NorthwindApp.Web.Controllers
+{
+    public class CustomersController : Controller
+    {
+
+        private readonly ICustomerRepository _customerRepository;
+
+        public CustomersController(ICustomerRepository customerRepository)
+        {
+            _customerRepository = customerRepository;
+        }
+
+        // GET: Customers
+        public async Task&lt;IActionResult&gt; Index()
+        {
+            return View(await _customerRepository.GetAllAsync());
+        }
+
+        // GET: Customers/Details/5
+        public async Task&lt;IActionResult&gt; Details(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customers = await _customerRepository.GetOneAsync(id);
+            if (customers == null)
+            {
+                return NotFound();
+            }
+
+            return View(customers);
+        }
+
+        // GET: Customers/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Customers/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; Create([Bind(&quot;CustomerId,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax&quot;)] Customers customers)
+        {
+            if (ModelState.IsValid)
+            {
+                await _customerRepository.CreateAsync(customers);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(customers);
+        }
+
+        // GET: Customers/Edit/5
+        public async Task&lt;IActionResult&gt; Edit(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customers = await _customerRepository.GetOneAsync(id);
+            if (customers == null)
+            {
+                return NotFound();
+            }
+            return View(customers);
+        }
+
+        // POST: Customers/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; Edit(string id, [Bind(&quot;CustomerId,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax&quot;)] Customers customers)
+        {
+            if (id != customers.CustomerId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _customerRepository.UpdateAsync(customers);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _customerRepository
+                        .ExistsAsync(customers.CustomerId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(customers);
+        }
+
+        // GET: Customers/Delete/5
+        public async Task&lt;IActionResult&gt; Delete(string id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var customers = await _customerRepository.GetOneAsync(id);
+            if (customers == null)
+            {
+                return NotFound();
+            }
+
+            return View(customers);
+        }
+
+        // POST: Customers/Delete/5
+        [HttpPost, ActionName(&quot;Delete&quot;)]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; DeleteConfirmed(string id)
+        {
+            var customers = await _customerRepository.GetOneAsync(id);
+            await _customerRepository.DeleteAsync(customers);
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}</code></pre><ul><li>SuppliersController.cs</li></ul><pre><code class="cs">using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ds.NorthwindApp.Web.Models;
+using ds.NorthwindApp.Web.Models.Interface;
+
+namespace ds.NorthwindApp.Web.Controllers
+{
+    public class SuppliersController : Controller
+    {
+        private readonly ISupplierRepository _supplierRepository;
+
+        public SuppliersController(ISupplierRepository supplierRepository)
+        {
+            _supplierRepository = supplierRepository;
+        }
+
+        // GET: Suppliers
+        public async Task&lt;IActionResult&gt; Index()
+        {
+            return View(await _supplierRepository.GetAllAsync());
+        }
+
+        // GET: Suppliers/Details/5
+        public async Task&lt;IActionResult&gt; Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var suppliers = await _supplierRepository.GetOneAsync(id.Value);
+
+
+            if (suppliers == null)
+            {
+                return NotFound();
+            }
+
+            return View(suppliers);
+        }
+
+        // GET: Suppliers/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Suppliers/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; Create([Bind(&quot;SupplierId,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax,HomePage&quot;)] Suppliers suppliers)
+        {
+            if (ModelState.IsValid)
+            {
+                await _supplierRepository.CreateAsync(suppliers);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(suppliers);
+        }
+
+        // GET: Suppliers/Edit/5
+        public async Task&lt;IActionResult&gt; Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var suppliers = await _supplierRepository.GetOneAsync(id.Value);
+            if (suppliers == null)
+            {
+                return NotFound();
+            }
+            return View(suppliers);
+        }
+
+        // POST: Suppliers/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; Edit(int id, [Bind(&quot;SupplierId,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax,HomePage&quot;)] Suppliers suppliers)
+        {
+            if (id != suppliers.SupplierId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _supplierRepository.UpdateAsync(suppliers);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!await _supplierRepository.ExistsAsync(suppliers.SupplierId))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(suppliers);
+        }
+
+        // GET: Suppliers/Delete/5
+        public async Task&lt;IActionResult&gt; Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var suppliers = await _supplierRepository.GetOneAsync(id.Value);
+
+            if (suppliers == null)
+            {
+                return NotFound();
+            }
+
+            return View(suppliers);
+        }
+
+        // POST: Suppliers/Delete/5
+        [HttpPost, ActionName(&quot;Delete&quot;)]
+        [ValidateAntiForgeryToken]
+        public async Task&lt;IActionResult&gt; DeleteConfirmed(int id)
+        {
+
+            var suppliers = await _supplierRepository.GetOneAsync(id);
+            await _supplierRepository.DeleteAsync(suppliers);
+            return RedirectToAction(nameof(Index));
+        }
+
+    }
+}</code></pre><h3 id="依存性注入"><a href="#依存性注入" class="headerlink" title="依存性注入"></a>依存性注入</h3><p>最後に、Startup.csのConfigureServicesメソッドの中にRepositoryとInterfaceの依存性注入の設定を追加します。</p><pre><code class="cs">public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllersWithViews();
+
+    // DB Context
+    services.AddDbContext&lt;NorthwindContext&gt;(options =&gt;
+        options.UseSqlServer(Configuration.GetConnectionString(&quot;northwind&quot;))
+    );
+
+    // Repository
+    services.AddTransient&lt;ICustomerRepository, CustomerRepository&gt;();
+    services.AddTransient&lt;ISupplierRepository, SupplierRepository&gt;();
+}</code></pre><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>Microsoftの公式リファレンスのチュートリアルを見ても、データ操作はControllerの中で行っています。</p><p>それには理由がありまして、書籍やリファレンスの解説はあくまでのフレームワークの特性や使い方に焦点を当てているためです。</p><p>プログラミング初心者にとって、フレームワークの特性を理解できても、コードの構造や階層化アーキテクチャは中々とっつきにくいものです。</p><p>つきまして、今後もこの<code>ASP.NET Core MVC</code> のシリーズでなるべく階層化アーキテクチャをわかりやすく説明するように心がけていきます。</p><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/ds-Mvc-Core/tree/master/ds.NorthwindApp_Part1" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/10/30/asp_net_core_mvc/TieredArchitecture/chap2/" class="link prev" title="ASP.NET Core MVC 階層化アーキテクチャ Chap2 (Generic Repositoryで共通化を図る)"><span class="hover-underline-animation">&larr; ASP.NET Core MVC 階層化アーキテクチャ Chap2 (Generic Repositoryで共通化を図る)</span> </a><a href="/2019/10/15/other/libman_proxy/" class="link next" title="Libmanのプロキシ経由接続"><span class="hover-underline-animation">Libmanのプロキシ経由接続 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#このコンテンツで扱うこと"><span class="toc-text">このコンテンツで扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#開発環境"><span class="toc-text">開発環境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#なぜ階層化アーキテクチャ"><span class="toc-text">なぜ階層化アーキテクチャ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#前回のおさらい"><span class="toc-text">前回のおさらい</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#関心の分離"><span class="toc-text">関心の分離</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Repository-Patternの実装"><span class="toc-text">Repository Patternの実装</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Interfaceの作成"><span class="toc-text">Interfaceの作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Repositoryの実装"><span class="toc-text">Repositoryの実装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ContorollerからRepositoryの呼び出し"><span class="toc-text">ContorollerからRepositoryの呼び出し</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#依存性注入"><span class="toc-text">依存性注入</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#まとめ"><span class="toc-text">まとめ</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

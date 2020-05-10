@@ -1,0 +1,105 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>Hexoを使って自分独自の技術ブログを構築する - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">Hexoを使って自分独自の技術ブログを構築する</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 5 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p>エンジニアにとって技術ブログを書くことはとても有意義です。まず、ブログで自分の成長を記録でき、仕事や学習における自分の考えを整理できます。また、ブログから自分を宣伝でき、社内＆社外の影響力を強めることができます。いざ転職しようとしたときに、ブログが自分のポートフォリオになります。</p><p>当然のことですが、ブログを書く以上継続しなければいけません。<br>三日坊主ですとあまり収穫がないのは言うまでもありません。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツで扱うこと"><a href="#1-このコンテンツで扱うこと" class="headerlink" title="1. このコンテンツで扱うこと"></a>1. このコンテンツで扱うこと</h3><ul><li>Hexoを用いて、ブログを構築</li><li>Hexoで作成したコンテンツをGitHub Pagesにアップロード</li><li>Domainを購入して、GitHub Pagesに適用する</li></ul><h3 id="2-環境"><a href="#2-環境" class="headerlink" title="2. 環境"></a>2. 環境</h3><p>NodejsとGitさえインストールされていれば、OSはなんでも構いません。</p><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>OS</td><td>Windows or Max or Linux</td></tr><tr><td>Nodejs</td><td><a href="https://nodejs.org/ja/" target="_blank" rel="noopener">nodejsはltsがおすすめ</a></td></tr><tr><td>Git</td><td><a href="https://git-scm.com/downloads" target="_blank" rel="noopener">gitは公式より最新版で良い</a></td></tr></tbody></table><h2 id="Hexo構築"><a href="#Hexo構築" class="headerlink" title="Hexo構築"></a>Hexo構築</h2><h3 id="1-Hexoとは"><a href="#1-Hexoとは" class="headerlink" title="1. Hexoとは"></a>1. Hexoとは</h3><p>Hexoは高速でかつシンプルなブログ構築のフレームワークです。<strong>Markdown</strong>で記事を作成し、HTMLへ変換できます。短時間で静的コンテンツのWebサイト作るなら、かなりいい選択肢だと思います。</p><p>エンジニアならMarkdownを使い慣れているはずなので、学習コストも少ないです。</p><p>構築手順も<a href="https://hexo.io/" target="_blank" rel="noopener">公式リファレンス</a>で丁寧に書かれています。</p><h3 id="2-初期作業"><a href="#2-初期作業" class="headerlink" title="2. 初期作業"></a>2. 初期作業</h3><p>まずはnodejsとgitがちゃんとインストールされているかどうかを確認します。</p><pre><code class="bash"> node --version
+ npm --version
+ git --version</code></pre><p>npmを用いてHexo Cliをインストールします。</p><pre><code class="bash">npm install -g hexo-cli</code></pre><p>これでブログ構築する準備が整いました。</p><h3 id="3-Hexoを使ってブログ構築"><a href="#3-Hexoを使ってブログ構築" class="headerlink" title="3. Hexoを使ってブログ構築"></a>3. Hexoを使ってブログ構築</h3><p>ここで書く内容が古くなる可能性もありますので、できれば一回<a href="https://hexo.io/" target="_blank" rel="noopener">公式リファレンス</a>を読んでください。</p><p>まずはブログのコンテンツ保存用のフォルダを初期化します。</p><pre><code class="bash">hexo init blog</code></pre><p>ブログのフォルダに入り、node必要モジュールをインストールします。</p><pre><code class="bash">cd blog
+npm install</code></pre><p>Hexo cliでクリーンとコンテンツ生成</p><pre><code class="bash">hexo clean
+hexo generate</code></pre><p>下記のコマンドでローカルでブログサイトを起動します。</p><pre><code class="bash">hexo server</code></pre><p>ポートを指定するやり方</p><pre><code class="bash">hexo s -p 8000 -o</code></pre><p>これで下記のように初期ページが表示されます。</p><p><img src="/images/hexo/2019-09-19-17-22-22.png" alt></p><h3 id="4-Hexoの設定情報を変更"><a href="#4-Hexoの設定情報を変更" class="headerlink" title="4. Hexoの設定情報を変更"></a>4. Hexoの設定情報を変更</h3><p>ブログの設定情報は<code>_config.yml</code> から編集できます。</p><pre><code class="yml"># Hexo Configuration
+## Docs: https://hexo.io/docs/configuration.html
+## Source: https://github.com/hexojs/hexo/
+
+# Site
+title: dongsuのブログ
+subtitle: 個人的な技術のナレッジの集約の場
+description:
+keywords:
+author: dongsu
+language: ja
+timezone:
+
+# URL
+## If your site is put in a subdirectory, set url as &#39;http://yoursite.com/child&#39; and root as &#39;/child/&#39;
+url: http://yoursite.com
+root: /
+permalink: :year/:month/:day/:title/
+permalink_defaults:
+
+# Directory
+source_dir: source
+public_dir: public
+tag_dir: tags
+archive_dir: archives
+category_dir: categories
+code_dir: downloads/code
+i18n_dir: :lang
+skip_render:
+
+# Writing
+new_post_name: :title.md # File name of new posts
+default_layout: post
+titlecase: false # Transform title into titlecase
+external_link: true # Open external links in new tab
+filename_case: 0
+render_drafts: false
+post_asset_folder: false
+relative_link: false
+future: true
+highlight:
+  enable: true
+  line_number: true
+  auto_detect: false
+  tab_replace:
+
+# Home page setting
+# path: Root path for your blogs index page. (default = &#39;&#39;)
+# per_page: Posts displayed per page. (0 = disable pagination)
+# order_by: Posts order. (Order by date descending by default)
+index_generator:
+  path: &#39;&#39;
+  per_page: 10
+  order_by: -date
+
+# Category &amp; Tag
+default_category: uncategorized
+category_map:
+tag_map:
+
+# Date / Time format
+## Hexo uses Moment.js to parse and display date
+## You can customize the date format as defined in
+## http://momentjs.com/docs/#/displaying/format/
+date_format: YYYY-MM-DD
+time_format: HH:mm:ss
+
+# Pagination
+## Set per_page to 0 to disable pagination
+per_page: 10
+pagination_dir: page
+
+# Extensions
+## Plugins: https://hexo.io/plugins/
+## Themes: https://hexo.io/themes/
+theme: landscape
+
+# Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy:
+  type:
+</code></pre><p>よく使うYAMLファイルの関連オプションの説明は以下です。</p><table><thead><tr><th>オプション</th><th>説明</th></tr></thead><tbody><tr><td><code>title</code></td><td>Webページのタイトル</td></tr><tr><td><code>subtitle</code></td><td>サブ開いとる</td></tr><tr><td><code>description</code></td><td>説明</td></tr><tr><td><code>keywords</code></td><td>Webサイトのキーワード、カンマで複数書けます</td></tr><tr><td><code>author</code></td><td>自分の名前</td></tr><tr><td><code>language</code></td><td>Webサイトの言語</td></tr><tr><td><code>timezone</code></td><td>Webサイトのタイムゾーン、デフォルトはPCの設定時刻になります</td></tr><tr><td><code>url</code></td><td>文字通りURL</td></tr><tr><td><code>root</code></td><td>Webサイトのルートディレクトリ</td></tr><tr><td><code>source_dir</code></td><td>Markdownやimageなどのコンテンツを保存するフォルダ、デフォルトはsource</td></tr><tr><td><code>public_dir</code></td><td>公開用コンテンツの保存フォルダ、デフォルトはpublic</td></tr><tr><td><code>tag_dir</code></td><td>タグフォルダ、デフォルトはtags</td></tr><tr><td><code>archive_dir</code></td><td>アーカイブフォルダ、デフォルトはarchives</td></tr><tr><td><code>category_dir</code></td><td>カテゴリーフォルダ、デフォルトはcategories</td></tr><tr><td><code>auto_spacing</code></td><td>英単語があるときに半角空白の挿入、デフォルトはfalse</td></tr><tr><td><code>titlecase</code></td><td>タイトルを大文字に変換する、デフォルトはfalse</td></tr><tr><td><code>external_link</code></td><td>新しいリンクで開く、デフォルトはtrue</td></tr><tr><td><code>relative_link</code></td><td>リンクをルートディレクトリの相対アドレスに変更する、デフォルトはfalse</td></tr><tr><td><code>default_category</code></td><td>デフォルトのカテゴリー</td></tr><tr><td><code>date_format</code></td><td>日付形式、デフォルトYYYY-MM-DD</td></tr><tr><td><code>time_format</code></td><td>時間形式、デフォルトHH:mm:ss</td></tr><tr><td><code>per_page</code></td><td>ページごとの記事を表示する件数、デフォルト10、0だとページングしない</td></tr><tr><td><code>pagination_dir</code></td><td>ページングのフォルダ、デフォルトはpage</td></tr><tr><td><code>theme</code></td><td>WebサイトのUIテーマ</td></tr><tr><td><code>deploy</code></td><td>デプロイ情報</td></tr></tbody></table><h3 id="5-記事作成"><a href="#5-記事作成" class="headerlink" title="5. 記事作成"></a>5. 記事作成</h3><p>Markdownで作成したファイルを<code>source/_posts</code> のフォルダにコピーし、以下のオプションを追加することで記事のタグ、カテゴリー、日付を設定できます。</p><table><thead><tr><th>オプション</th><th>説明</th><th>デフォルト値</th></tr></thead><tbody><tr><td><code>layout</code></td><td>レイアウト</td><td></td></tr><tr><td><code>title</code></td><td>タイトル</td><td></td></tr><tr><td><code>date</code></td><td>作成日</td><td></td></tr><tr><td><code>updated</code></td><td>更新日</td><td></td></tr><tr><td><code>comments</code></td><td>コメント機能のOn・Off</td><td>true</td></tr><tr><td><code>tags</code></td><td>タグ</td><td></td></tr><tr><td><code>categories</code></td><td>カテゴリー</td><td></td></tr></tbody></table><p>例えば以下のように記事を作成します。</p><pre><code class="Markdown">---
+title: ASP.NET Core 入門1 ASP.NET Coreを使って初めてのWebアプリを構築
+category: skill
+tags:
+- dotnet
+date: 2019-09-03
+comments: true
+---
+
+`ASP.NET Core`を学習することにあたって、思考の整理と学習記録をここの記載します。
+
+私自身も`.NET Core`を触るのが初めてなので、間違っている部分があれば、コメントにて指摘をお願いします。
+</code></pre><h3 id="6-ローカルで稼働確認"><a href="#6-ローカルで稼働確認" class="headerlink" title="6. ローカルで稼働確認"></a>6. ローカルで稼働確認</h3><p>記事を書き終えたら、以下のコマンドを使ってローカルで動作確認します。</p><pre><code class="bash">hexo clean
+hexo generate
+hexo server -p 8000 -o</code></pre><h2 id="Github-Pagesにアップロード"><a href="#Github-Pagesにアップロード" class="headerlink" title="Github Pagesにアップロード"></a>Github Pagesにアップロード</h2><p>GitHub Pagesでブログを公開することができます。当然Githubのアカウントを持っていることが前提ですので、なければ作成してください。</p><h3 id="1-ブログ用のリポジトリを作成"><a href="#1-ブログ用のリポジトリを作成" class="headerlink" title="`1. ブログ用のリポジトリを作成"></a>`1. ブログ用のリポジトリを作成</h3><p>まずは、GitHub上に以下の名前でパブリックリポジトリを作成します。</p><ul><li>{自分自身のGithubアカウント名}.github.io</li></ul><p>例）</p><p><img src="/images/hexo/2019-09-19-17-53-07.png" alt></p><h3 id="2-設定ファイルの変更"><a href="#2-設定ファイルの変更" class="headerlink" title="2. 設定ファイルの変更"></a>2. 設定ファイルの変更</h3><p>Hexoの設定ファイル<code>_config.yml</code>を編集します。</p><pre><code class="YAML"># Deployment
+## Docs: https://hexo.io/docs/deployment.html
+deploy:
+    type: git
+    repo: https://github.com/dongsu-iis/dongsu-iis.github.io.git
+    branch: master</code></pre><h3 id="3-Gitからデプロイ"><a href="#3-Gitからデプロイ" class="headerlink" title="3. Gitからデプロイ"></a>3. Gitからデプロイ</h3><p>GitHubにデプロイするためのNodeモジュールをインストールします。</p><pre><code class="bash">npm install hexo-deployer-git --save</code></pre><p>以下のコマンドを実行すると、Github Pagesにアップロードできます。</p><pre><code class="bash">hexo deploy -g</code></pre><p>このコマンドでもOKです。</p><pre><code class="Shell">hexo generate -d</code></pre><p>ブラウザーでdongsu-iis.github.ioへアクセスして、アップロードしたWebサイトを確認してみてください。</p><h2 id="独自ドメインを適用"><a href="#独自ドメインを適用" class="headerlink" title="独自ドメインを適用"></a>独自ドメインを適用</h2><p>Github PagesにWebサイトを公開できましたが、github.ioのドメイン名がダサいと思われるかもしれませんので、自分独自のドメインにすることもできます。</p><p>私の場合、ムームードメインで独自ドメインを買いました。</p><p>買ったドメインの以下の手順に沿って、DNSレコード設定をします。</p><p><a href="https://help.github.com/ja/articles/setting-up-an-apex-domain" target="_blank" rel="noopener">公式手順</a></p><p>最後に<code>source</code> フォルダ配下にCNAMEというファイルを作成して、ドメイン名を記載します。</p><pre><code class="text">dongsu.dev</code></pre><p>上記の手順を終えたら、再度GitHub Pagesへアップロードすれば、自分独自のブログの完成です。</p><h2 id="最後に"><a href="#最後に" class="headerlink" title="最後に"></a>最後に</h2><p>技術ブログを生かして共にエンジニアとして、成長し、情報共有しましょう。</p><p>エンジニアの未来に幸あれ！</p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/24/other/shokusenki/" class="link prev" title="エンジニアの必須家電はこれで決まり"><span class="hover-underline-animation">&larr; エンジニアの必須家電はこれで決まり</span> </a><a href="/2019/09/19/asp_net_core_mvc/basic/chap06/" class="link next" title="ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト"><span class="hover-underline-animation">ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツで扱うこと"><span class="toc-text">1. このコンテンツで扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境"><span class="toc-text">2. 環境</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hexo構築"><span class="toc-text">Hexo構築</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Hexoとは"><span class="toc-text">1. Hexoとは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-初期作業"><span class="toc-text">2. 初期作業</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Hexoを使ってブログ構築"><span class="toc-text">3. Hexoを使ってブログ構築</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Hexoの設定情報を変更"><span class="toc-text">4. Hexoの設定情報を変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-記事作成"><span class="toc-text">5. 記事作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-ローカルで稼働確認"><span class="toc-text">6. ローカルで稼働確認</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Github-Pagesにアップロード"><span class="toc-text">Github Pagesにアップロード</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ブログ用のリポジトリを作成"><span class="toc-text">`1. ブログ用のリポジトリを作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-設定ファイルの変更"><span class="toc-text">2. 設定ファイルの変更</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Gitからデプロイ"><span class="toc-text">3. Gitからデプロイ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#独自ドメインを適用"><span class="toc-text">独自ドメインを適用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最後に"><span class="toc-text">最後に</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>Angular学習まとめ - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">Angular学習まとめ</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 7 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p>とりあえず、自分が大事だと思ったポイントをつらつらと書いただけなので、”まとめ”と謳ってる癖に内容が整理されていない部分も多々あると思いますが、ご了承ください。</p><h2 id="Get-Started"><a href="#Get-Started" class="headerlink" title="Get Started"></a>Get Started</h2><h3 id="Angularの特徴"><a href="#Angularの特徴" class="headerlink" title="Angularの特徴"></a>Angularの特徴</h3><ul><li>クロスプラットフォーム<ul><li>PWA</li><li>Electron</li></ul></li><li>パフォーマンス<ul><li>Code generation (AOT)</li><li>Universal</li></ul></li><li>生産性<ul><li>Templates</li><li>Angular CLI</li><li>IDE (Vscode)</li></ul></li><li>テストビリティ<ul><li>Unit Test (Karma)</li><li>E2E Test (Protractor)</li></ul></li><li><a href="https://www.typescriptlang.org/index.html" target="_blank" rel="noopener">TypeScript</a><ul><li>オブジェクト指向言語(Java, C#)できる人と親和性が高い</li><li>TypeScriptはあくまでサポート、JavaScriptできるに越したことない</li></ul></li></ul><h3 id="環境構築"><a href="#環境構築" class="headerlink" title="環境構築"></a>環境構築</h3><p>Windows 10 で作業を行う。事前に<a href="https://chocolatey.org/" target="_blank" rel="noopener">chocolatey</a>をインストールしておく。</p><h4 id="chocolateyでインストール"><a href="#chocolateyでインストール" class="headerlink" title="chocolateyでインストール"></a>chocolateyでインストール</h4><pre><code class="bash">## 開発環境と必要ツールインストール
+choco install nodejs-lts notepadplusplus vscode git -y
+
+## 自動更新のソフトをchocoから管理外にする
+choco uninstall vscode --skip-autouninstaller</code></pre><h4 id="npmからAngular-Cliをインストール"><a href="#npmからAngular-Cliをインストール" class="headerlink" title="npmからAngular Cliをインストール"></a>npmからAngular Cliをインストール</h4><pre><code class="bash">npm i -g @angular/cli</code></pre><h4 id="vscodeの拡張機能をインストール"><a href="#vscodeの拡張機能をインストール" class="headerlink" title="vscodeの拡張機能をインストール"></a>vscodeの拡張機能をインストール</h4><ul><li>Angular Extension Pack</li></ul><h2 id="Basic"><a href="#Basic" class="headerlink" title="Basic"></a>Basic</h2><h3 id="プロジェクト作成"><a href="#プロジェクト作成" class="headerlink" title="プロジェクト作成"></a>プロジェクト作成</h3><pre><code class="bash">## プロジェクト作成
+ng new demo1
+
+## 起動
+cd demo1
+npm start</code></pre><h3 id="プロジェクト構造"><a href="#プロジェクト構造" class="headerlink" title="プロジェクト構造"></a>プロジェクト構造</h3><pre><code>demo1
+├── angular.json (Angular設定ファイル)
+├── browserslist
+├── e2e (E2Eテスト)
+│   ├── protractor.conf.js (E2Eテスト設定ファイル)
+│   ├── src
+│   │   ├── app.e2e-spec.ts
+│   │   └── app.po.ts
+│   └── tsconfig.json
+├── karma.conf.js (Unitテスト設定ファイル)
+├── package-lock.json
+├── package.json (npm設定ファイル)
+├── src
+│   ├── app
+│   │   ├── app-routing.module.ts
+│   │   ├── app.component.css (CSS)
+│   │   ├── app.component.html (HTML)
+│   │   ├── app.component.spec.ts　(Unit Test Code)
+│   │   ├── app.component.ts (Class)
+│   │   ├── app.module.ts
+│   │   └── page1
+│   │       ├── page1.component.css
+│   │       ├── page1.component.html
+│   │       ├── page1.component.spec.ts
+│   │       └── page1.component.ts
+│   ├── assets (静的リソース)
+│   │   ├── fonts
+│   │   ├── images
+│   │   ├── scripts
+│   │   └── styles
+│   ├── environments (環境変数)
+│   │   ├── environment.prod.ts
+│   │   └── environment.ts
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── main.ts
+│   ├── polyfills.ts (古いブラウザ対応必要なときの設定ファイル)
+│   ├── styles.css
+│   └── test.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.spec.json
+└── tslint.json</code></pre><h3 id="ModuleとComponent"><a href="#ModuleとComponent" class="headerlink" title="ModuleとComponent"></a>ModuleとComponent</h3><h3 id="基本コマンド"><a href="#基本コマンド" class="headerlink" title="基本コマンド"></a>基本コマンド</h3><p>Component生成</p><pre><code class="bash">ng generate component page1
+
+## 簡略版
+ng g c page2</code></pre><p>発行</p><pre><code class="bash">ng build
+
+## 製品版(JavaScriptが圧縮される)
+ng build --prod</code></pre><p><a href="https://update.angular.io/" target="_blank" rel="noopener">Angularのバージョンアップサイト</a></p><pre><code class="bash">## local angular
+ng update
+
+## global angular cli update
+npm list -g --depth=0
+npm outdated -g
+npm i -g @angular/cli</code></pre><h2 id="Data-Binding"><a href="#Data-Binding" class="headerlink" title="Data Binding"></a>Data Binding</h2><h3 id="Interprolation"><a href="#Interprolation" class="headerlink" title="Interprolation"></a>Interprolation</h3><p><code></code></p><ul><li><p>html</p><pre><code class="html">&lt;p&gt;{{title}}&lt;/p&gt;</code></pre></li><li><p>ts</p><pre><code class="ts">export class AppComponent {
+  title = &#39;demo1&#39;;
+}</code></pre></li></ul><h3 id="Property-Binding"><a href="#Property-Binding" class="headerlink" title="Property Binding"></a>Property Binding</h3><p><code>[property]=&quot;statement&quot;</code></p><ul><li><p>html</p><pre><code class="html">&lt;a [href]=&quot;url&quot; [attr.data-title]=&quot;title&quot;&gt;{{title}}&lt;/a&gt;</code></pre></li><li><p>ts</p><pre><code class="ts">export class AppComponent {
+  title = &#39;demo1&#39;;
+  url = &#39;http://dongsu.dev/&#39;;
+}</code></pre></li></ul><h3 id="Event-Binding"><a href="#Event-Binding" class="headerlink" title="Event Binding"></a>Event Binding</h3><p><code>(click)=&quot;method()&quot;</code></p><ul><li><p>html</p><pre><code class="html">&lt;button (click)=&quot;doCancel()&quot;&gt;Cancel Edit&lt;/button&gt;</code></pre></li><li><p>ts</p><pre><code class="ts">export class AppComponent {
+  doCancel() {
+    // Dosomething
+    this.isEdit = false;
+  }
+}</code></pre></li></ul><h3 id="Two-way-Binding"><a href="#Two-way-Binding" class="headerlink" title="Two-way Binding"></a>Two-way Binding</h3><p><code>[(ngModel)]=&quot;Property&quot;</code></p><ul><li><p>html</p><pre><code class="html"> &lt;input type=&quot;text&quot; size=&quot;70&quot; [(ngModel)]=&quot;item.title&quot; &gt;</code></pre></li><li><p>ts(app.module.ts)</p><pre><code class="ts">import { FormsModule } from &#39;@angular/forms&#39;;
+
+@NgModule({
+imports: [
+  CommonModule,
+  FormsModule
+]
+})</code></pre></li><li><p>ts(app.component.ts)</p><pre><code class="ts">export class AppComponent {
+  item;
+}</code></pre></li></ul><h3 id="Template-Reference-variables"><a href="#Template-Reference-variables" class="headerlink" title="Template Reference variables"></a>Template Reference variables</h3><p>HTMLの任意のタグで<code>#name</code>をつけることでタグ配下の要素を取得できたり、<br>Component配下のObjectをアクセスできる。</p><ul><li><p>html</p><pre><code class="html">&lt;app-header #tHeader&gt;&lt;/app-header&gt;
+
+&lt;p (click)=&quot;#tHeader.title = &#39;Title Changed&#39;&quot;&gt;Click Me&lt;/p&gt;</code></pre></li></ul><h2 id="Directives"><a href="#Directives" class="headerlink" title="Directives"></a>Directives</h2><h3 id="Component-Directives"><a href="#Component-Directives" class="headerlink" title="Component Directives"></a>Component Directives</h3><p>Componetごとのcssは独立しており、タグでスタイルを定義しても他のComponentのスタイルに影響はない。やろうと思えば、以下のやり方でスタイル全体適用は可能。</p><ul><li><p>ts</p><pre><code class="ts">@Component({
+  styleUrls : [&#39;./footer.component.css&#39;],
+  encapsulation : ViewEncapsulation.None
+})</code></pre></li></ul><h3 id="Attribute-Directives"><a href="#Attribute-Directives" class="headerlink" title="Attribute Directives"></a>Attribute Directives</h3><h4 id="ngClass"><a href="#ngClass" class="headerlink" title="ngClass"></a>ngClass</h4><p>動的にスタイルを変更させる。<br><code>[ngClass]=&quot;bool値&quot;</code></p><ul><li><p>html</p><pre><code class="html">&lt;h3 [ngClass]=&quot;{&#39;highlight&#39; : counter %2 ==0}&quot;&gt;Hello&lt;/h3&gt;
+&lt;h3 [class.highlight]=&quot;{counter %2 ==0}&quot;&gt;Hello&lt;/h3&gt;</code></pre></li></ul><h4 id="NgIf"><a href="#NgIf" class="headerlink" title="NgIf"></a>NgIf</h4><p>動的にタグの存続状態を変化させる<br><code>*ngIf=&quot;bool値&quot;</code></p><ul><li><p>html</p><pre><code class="html">&lt;div *ngIf=&quot;counter %2 ==0&quot;&gt;
+  &lt;!-- ここ配下全部消える--&gt;
+  &lt;h1&gt;H1&lt;/h1&gt;
+  &lt;h1&gt;H1&lt;/h1&gt;
+  &lt;h1&gt;H1&lt;/h1&gt;
+&lt;/div&gt;</code></pre></li></ul><h4 id="NgSwitch"><a href="#NgSwitch" class="headerlink" title="NgSwitch"></a>NgSwitch</h4><p>動的にタグをCase文で制御する<br><code>[ngSwitch] = {条件}</code><br><code>ngSwitchCase={ケース}</code></p><ul><li><p>html</p><pre><code class="html">&lt;ng-container [ngSwith] = &quot;counter % 2&quot;&gt;
+  &lt;ng-container *ngSwitchCase=&quot;0&quot;&gt;Output0&lt;/ng-container&gt;
+  &lt;ng-container *ngSwitchCase=&quot;1&quot;&gt;Output1&lt;/ng-container&gt;
+  &lt;ng-container *ngSwitchDefault&gt;N/A&lt;/ng-container&gt;
+&lt;/ng-container&gt;</code></pre></li></ul><p><code>div</code>じゃなく<code>ng-container</code>にした理由は余計なHTMLタグを生成されず、レイアウトを崩さないため</p><h4 id="NgFor"><a href="#NgFor" class="headerlink" title="NgFor"></a>NgFor</h4><p>繰り返し処理<br><code>*ngFor = ley item of data</code></p><ul><li><p>html</p><pre><code class="html">&lt;article class=&quot;post&quot; id=&quot;post{{idx}}&quot; *ngFor=&quot;let item of data; let idx=index&quot;&gt;
+  &lt;app-article-header [item]=&quot;item&quot; (delete)=&quot;doDelete($event)&quot; (titleChanged)=&quot;doModify($event)&quot;&gt;
+  &lt;/app-article-header&gt;
+  &lt;app-article-body [item]=&quot;item&quot; [counter]=&quot;counter&quot;&gt;&lt;/app-article-body&gt;
+&lt;/article&gt;</code></pre></li></ul><h2 id="Module"><a href="#Module" class="headerlink" title="Module"></a>Module</h2><p>機能ごとModule分割するのがベストプラクティスです。</p><pre><code class="bash">ng g m {module name} -m {}</code></pre><p>既存のModuleにfeature Moduleを追加する。</p><pre><code class="bash">ng g m {module name} -m {既存module name}</code></pre><p>feature Componentの作り方</p><pre><code class="bash">cd src
+cd app
+cd {feature module folder name}
+ng g c {componet name}</code></pre><p>app で使うfeature component は fearter moduleでexportsを入れることを忘れなく</p><pre><code class="ts">@NgModule({
+  exports: [{componet name}],
+})</code></pre><p>componentのData受け渡し</p><h3 id="Input"><a href="#Input" class="headerlink" title="Input"></a>Input</h3><ul><li><p>ts</p><pre><code class="ts">@Input()
+item;</code></pre></li><li><p>html</p><pre><code class="html">&lt;app-body [item]=&quot;item&quot;&gt;&lt;/app-body&gt;</code></pre></li></ul><h3 id="Componentのライフサイクル"><a href="#Componentのライフサイクル" class="headerlink" title="Componentのライフサイクル"></a>Componentのライフサイクル</h3><ol><li><code>constructor</code> : クラスのインスタンス生成時に呼ばれる。基本DI用途しか使わない</li><li><code>ngOnChanges</code> : <code>@Input</code>のプロパティに変更があった場合に触発する</li><li><code>ngOnInit</code> : インスタンス生成後。プロパティの初期値を設定したり、Ajax実行してサーバーからデータ取得し、画面表示させたりする用途。</li><li><code>ngOnDestroy</code> : 最後に呼ばれる。オブジェクトの破棄で使う。ほぼ使わない。</li></ol><h3 id="Output"><a href="#Output" class="headerlink" title="Output"></a>Output</h3><p>イベントとプロパティを定義</p><ul><li><p>子Component</p><pre><code class="ts">// 発火
+@Output()
+delete = new EventEmitter&lt;any&gt;();
+
+deleteArticle() {
+  this.delete.emit(this.item);
+}</code></pre><pre><code class="html">&lt;button (click)=&quot;deleteArticle()&quot;&gt;Delete&lt;/button&gt;</code></pre></li><li><p>親Component</p><pre><code class="ts">doDelete(item) {
+  this.data.filter((v)=&gt;{
+    return v !== item;
+  });
+}</code></pre><pre><code class="html">&lt;app-article-header [item]=&quot;item&quot; (delete)=&quot;doDelete($event)&quot;&gt;
+&lt;/app-article-header&gt;</code></pre></li></ul><h3 id="単一方向データフロー"><a href="#単一方向データフロー" class="headerlink" title="単一方向データフロー"></a>単一方向データフロー</h3><p>子Componentでなるべくデータを変更しない思想の設計である。</p><p>子Component内で<code>[(ngModel)]</code>を使って直接データ変更でき、楽に実装できるが、Component同士の依存性は強くなり将来的にメンテナンスしにくくなる。</p><ul><li><p>子Component</p><pre><code class="ts">@Output()
+titleChanged = new EventEmitter&lt;any&gt;();
+
+doEdit(title) {
+  this.newTitle = title;
+  this.titleChanged.emit({id : this.item.id, title: title});
+}</code></pre><pre><code class="html">&lt;input type=&quot;text&quot; [value]=&quot;item.title&quot; (keyup.enter)=&quot;doEdit($event.target.value)&quot;&gt;</code></pre></li><li><p>親Component</p><pre><code class="ts">doModify($event : any) {
+  this.data = this.data.map((item) =&gt; {
+      if (item.id == $event.id) {
+        // 新しいObjectを返す
+        return Object.assign({}, item, $event);
+      }
+      return item;
+    });
+}</code></pre><pre><code class="html">&lt;app-article-header [item]=&quot;item&quot; (titleChanged)=&quot;doModify($event)&quot;&gt;
+&lt;/app-article-header&gt;</code></pre></li></ul><h3 id="ngOnChangesライフサイクルHook"><a href="#ngOnChangesライフサイクルHook" class="headerlink" title="ngOnChangesライフサイクルHook"></a>ngOnChangesライフサイクルHook</h3><p><code>@Input</code>のプロパティに変更があった場合に触発する。</p><pre><code class="ts">ngOnChanges(changes : any) {
+  if (changes.item) {
+    // 変更前のオブジェクトを保管できる
+    this.orig_item = changes.item.currentValue;
+    // 新しいオブジェクト
+    this.item = Object.assign({}, changes.item.currentValue);
+  }
+}
+
+doEdit() {
+  this.titleChanged.emit(this.item);
+}</code></pre><pre><code class="html">&lt;input type=&quot;text&quot; [(ngModel)]=&quot;item.title&quot; (keyup.enter)=&quot;doEdit()&quot;&gt;</code></pre><h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><p>コマンドからServiceを生成</p><pre><code class="bash">ng g s {service name}</code></pre><p>Module内でServiceを注入する</p><pre><code class="ts">@NgModule({
+  providers: [DataService]
+})</code></pre><p>ComponentでDIして利用する</p><pre><code class="ts">datasvc : DataService;
+constructor(datasvc: DataService) {
+  this.datasvc = datasvc;
+}
+
+// こっちのほうがスマート（htmlでserviceを使いたい場合はpublicにすればいい）
+constructor(private datasvc: DataService) {
+}</code></pre><h2 id="Observable-async"><a href="#Observable-async" class="headerlink" title="Observable async"></a>Observable async</h2><p>Observableのsubscribeを省略できる</p><ul><li><p>Service</p><pre><code class="ts">getData() {
+  return this.http.get(&#39;http://localhost:4200/api/articles.json&#39;);
+}</code></pre></li><li><p>Component</p><pre><code class="ts">// Observableオブジェクトは後ろに$をつけるのが一般的
+data$ : Observable&lt;any&gt;;
+
+ngOnInit() {
+  this.data$ = this.datasvc.getData();
+}</code></pre><pre><code class="html">&lt;div *ngFor=&quot;let item of data$|async;&quot;&gt;&lt;/div&gt;</code></pre></li></ul></section></article><section class="prev-next card slide-in-right"><a class="link-disabled prev link">&larr; それ以上ない</a> <a href="/2020/03/08/other/shikaku2/" class="link next" title="ベンダー資格は時間と金の無駄"><span class="hover-underline-animation">ベンダー資格は時間と金の無駄 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Get-Started"><span class="toc-text">Get Started</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Angularの特徴"><span class="toc-text">Angularの特徴</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#環境構築"><span class="toc-text">環境構築</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#chocolateyでインストール"><span class="toc-text">chocolateyでインストール</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#npmからAngular-Cliをインストール"><span class="toc-text">npmからAngular Cliをインストール</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#vscodeの拡張機能をインストール"><span class="toc-text">vscodeの拡張機能をインストール</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Basic"><span class="toc-text">Basic</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#プロジェクト作成"><span class="toc-text">プロジェクト作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#プロジェクト構造"><span class="toc-text">プロジェクト構造</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ModuleとComponent"><span class="toc-text">ModuleとComponent</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基本コマンド"><span class="toc-text">基本コマンド</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Data-Binding"><span class="toc-text">Data Binding</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Interprolation"><span class="toc-text">Interprolation</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Property-Binding"><span class="toc-text">Property Binding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Event-Binding"><span class="toc-text">Event Binding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Two-way-Binding"><span class="toc-text">Two-way Binding</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Template-Reference-variables"><span class="toc-text">Template Reference variables</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Directives"><span class="toc-text">Directives</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Component-Directives"><span class="toc-text">Component Directives</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Attribute-Directives"><span class="toc-text">Attribute Directives</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ngClass"><span class="toc-text">ngClass</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NgIf"><span class="toc-text">NgIf</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NgSwitch"><span class="toc-text">NgSwitch</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#NgFor"><span class="toc-text">NgFor</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Module"><span class="toc-text">Module</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Input"><span class="toc-text">Input</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Componentのライフサイクル"><span class="toc-text">Componentのライフサイクル</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Output"><span class="toc-text">Output</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#単一方向データフロー"><span class="toc-text">単一方向データフロー</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ngOnChangesライフサイクルHook"><span class="toc-text">ngOnChangesライフサイクルHook</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Service"><span class="toc-text">Service</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Observable-async"><span class="toc-text">Observable async</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

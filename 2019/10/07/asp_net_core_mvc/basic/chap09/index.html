@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 3 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><code>ASP.NET Core</code> はWindowsのみではなく、Linux上でも動作します。今回は今まで作成したソースコードをCentOS7上に乗せて動作するまでを行います。</p><p><a href="https://dongsu.dev/2019/10/01/asp_net_core_mvc/basic/chap08/">前回内容</a></p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/ds.Tutorial" target="_blank" rel="noopener">ソースコード</a></p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>CentOS7の<code>.NET Core</code>環境＆Nginx環境のセットアップが完了していること。</p><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li>作成した<code>ASP.NET Core MVC</code> プロジェクトの発行</li><li>作成した<code>ASP.NET Core MVC</code> プロジェクトをLinuxサーバーへ転送し、Nginxへデプロイを行う</li><li>アプリケーションをサービス起動＆停止のスクリプトを作成</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>開発環境 OS</td><td>Windows 10 1903</td></tr><tr><td>サーバー側 OS</td><td>CentOS 7</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.38.1</td></tr><tr><td>サーバー側 DB</td><td>SQL Server 2017 Developer</td></tr><tr><td>ファイル転送ツール</td><td><a href="https://filezilla-project.org/" target="_blank" rel="noopener">FileZilla</a></td></tr></tbody></table><h3 id="3-事前準備"><a href="#3-事前準備" class="headerlink" title="3. 事前準備"></a>3. 事前準備</h3><p>Program.csファイルの起動URLを5000へ変更します。</p><pre><code class="cs">public static IWebHostBuilder CreateWebHostBuilder (string[] args) =&gt;
+    WebHost.CreateDefaultBuilder (args)
+    .UseStartup&lt;Startup&gt; ()
+    .ConfigureLogging (logging =&gt; {
+        logging.ClearProviders ();
+        logging.SetMinimumLevel (LogLevel.Information);
+        logging.AddConsole ();
+    })
+    .UseNLog ()
+    .UseUrls(&quot;http://*:5000&quot;);
+}</code></pre><h2 id="発行"><a href="#発行" class="headerlink" title="発行"></a>発行</h2><h3 id="1-ローカル上に発行"><a href="#1-ローカル上に発行" class="headerlink" title="1. ローカル上に発行"></a>1. ローカル上に発行</h3><p>ソリューションフォルダにて発行commandを実行します。</p><pre><code class="bash">cd ds.Tutorial.web
+
+dotnet publish -c release</code></pre><h3 id="2-ローカル上で動作確認"><a href="#2-ローカル上で動作確認" class="headerlink" title="2. ローカル上で動作確認"></a>2. ローカル上で動作確認</h3><p>下記のcommandを実行後、localhost:5000へアクセスして問題なく動くことを確認します。</p><pre><code class="bash">cd bin\release\netcoreapp2.1\publish
+
+dotnet ds.Tutorial.web.dll</code></pre><h2 id="デプロイ"><a href="#デプロイ" class="headerlink" title="デプロイ"></a>デプロイ</h2><h3 id="1-アプリケーション用のフォルダ作成"><a href="#1-アプリケーション用のフォルダ作成" class="headerlink" title="1. アプリケーション用のフォルダ作成"></a>1. アプリケーション用のフォルダ作成</h3><ul><li><p>フォルダの作成と権限付与を行います。</p><pre><code class="bash">  $ sudo mkdir -p  /webroot/ds.Tutorial.web
+
+  $ sudo mkdir -p  /webroot/ds.Tutorial.web/app
+
+  $ sudo mkdir -p  /webroot/ds.Tutorial.web/logs
+
+  $ sudo chmod 777 /webroot/ds.Tutorial.web/app
+
+  $ sudo chmod 777 /webroot/ds.Tutorial.web/logs</code></pre></li><li><p>FTP転送</p><p>ファイル転送ツール<a href="https://filezilla-project.org/" target="_blank" rel="noopener">FileZilla</a> を用いて、ローカルのpublishフォルダ配下のファイルをすべて/webroot/ds.Tutorial.web/appにコピーします。</p></li><li><p>サーバー上で稼働確認</p><pre><code class="bash">  cd /webroot/ds.Tutorial.web/app
+  dotnet ds.Tutorial.web.dll</code></pre><p>http://{centosのIP}:5000へアクセスして稼働確認をします。<br>Ctrl + Cでアプリケーションが停止します。</p></li></ul><h2 id="サービス起動＆停止のスクリプト"><a href="#サービス起動＆停止のスクリプト" class="headerlink" title="サービス起動＆停止のスクリプト"></a>サービス起動＆停止のスクリプト</h2><p>アプリケーションの起動と停止ができるようにシェルスクリプトを作成します。</p><h3 id="1-起動shell"><a href="#1-起動shell" class="headerlink" title="1. 起動shell"></a>1. 起動shell</h3><p>start.shを作成します。</p><pre><code class="bash">$ sudo vi /webroot/ds.Tutorial.web/start.sh</code></pre><p>中身</p><pre><code class="bash">#!/bin/sh
+cd $(cd &quot;$(dirname &quot;$0&quot;)&quot;; pwd)
+APP_NAME=ds.Tutorial.web.dll
+echo &quot;start begin...&quot;
+echo $APP_NAME
+
+cd app
+nohup  dotnet $APP_NAME &gt;&gt;../logs/info.log 2&gt;&gt;../logs/error.log &amp;
+cd
+
+sleep 5
+
+if test $(pgrep -f $APP_NAME|wc -l) -eq 0
+then
+   echo &quot;start failed&quot;
+else
+   echo &quot;start successed&quot;
+fi</code></pre><h3 id="2-停止shell"><a href="#2-停止shell" class="headerlink" title="2. 停止shell"></a>2. 停止shell</h3><p>stop.shを作成します。</p><pre><code class="bash">$ sudo vi /webroot/ds.Tutorial.web/stop.sh</code></pre><p>中身</p><pre><code class="bash">#!/bin/sh
+cd $(cd &quot;$(dirname &quot;$0&quot;)&quot;; pwd)
+APP_NAME=ds.Tutorial.web.dll
+
+PROCESS=`ps -ef|grep $APP_NAME|grep -v grep  |awk &#39;{ print $2}&#39;`
+while :
+do
+  kill -9 $PROCESS &gt; /dev/null 2&gt;&amp;1
+  if [ $? -ne 0 ];then
+   break
+  else
+   continue
+fi
+done
+
+echo &#39;stop success!&#39;</code></pre><h3 id="3-スクリプトのテスト"><a href="#3-スクリプトのテスト" class="headerlink" title="3. スクリプトのテスト"></a>3. スクリプトのテスト</h3><pre><code class="bash">$ sh /webroot/ds.Tutorial.web/start.sh
+start begin...
+ds.Tutorial.web.dll
+start successed
+
+$ sh /webroot/ds.Tutorial.web/stop.sh
+stop success!</code></pre><h3 id="4-アプリケーションのサービス化"><a href="#4-アプリケーションのサービス化" class="headerlink" title="4. アプリケーションのサービス化"></a>4. アプリケーションのサービス化</h3><p>サービスを作成</p><pre><code class="bash">$ sudo vi /usr/lib/systemd/system/ds.Tutorial.web.service</code></pre><p>中身</p><pre><code class="ini">[Unit]
+Description=ds.Tutorial.web
+After=network.target
+
+[Service]
+WorkingDirectory=/webroot/ds.Tutorial.web/app
+ExecStart=/usr/bin/dotnet /webroot/ds.Tutorial.web/app/ds.Tutorial.web.dll
+ExecStop=/webroot/ds.Tutorial.web/stop.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target</code></pre><p>サービスの起動＆停止確認</p><pre><code class="bash">$ sudo systemctl start ds.Tutorial.web
+$ sudo systemctl stop ds.Tutorial.web</code></pre></section></article><section class="prev-next card slide-in-right"><a href="/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/" class="link prev" title="ASP.NET Core MVC 階層化アーキテクチャ Chap0 (ScaffoldからC.R.U.D操作を理解する)"><span class="hover-underline-animation">&larr; ASP.NET Core MVC 階層化アーキテクチャ Chap0 (ScaffoldからC.R.U.D操作を理解する)</span> </a><a href="/2019/10/01/asp_net_core_mvc/basic/chap08/" class="link next" title="ASP.NET Core 入門8 ASP.NET Core + Entity Framework CoreでDB接続"><span class="hover-underline-animation">ASP.NET Core 入門8 ASP.NET Core + Entity Framework CoreでDB接続 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-事前準備"><span class="toc-text">3. 事前準備</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#発行"><span class="toc-text">発行</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ローカル上に発行"><span class="toc-text">1. ローカル上に発行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-ローカル上で動作確認"><span class="toc-text">2. ローカル上で動作確認</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#デプロイ"><span class="toc-text">デプロイ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-アプリケーション用のフォルダ作成"><span class="toc-text">1. アプリケーション用のフォルダ作成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#サービス起動＆停止のスクリプト"><span class="toc-text">サービス起動＆停止のスクリプト</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-起動shell"><span class="toc-text">1. 起動shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-停止shell"><span class="toc-text">2. 停止shell</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-スクリプトのテスト"><span class="toc-text">3. スクリプトのテスト</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-アプリケーションのサービス化"><span class="toc-text">4. アプリケーションのサービス化</span></a></li></ol></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

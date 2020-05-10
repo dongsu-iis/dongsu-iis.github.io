@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>社内Gitサーバー構築手順 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">社内Gitサーバー構築手順</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 4 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p>社内Gitサーバーの構築手順を記述します。</p><h1 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h1><ul><li>CentOS 7 <a href="https://www.centos.org/" target="_blank" rel="noopener">https://www.centos.org/</a></li><li>Docker <a href="https://www.docker.com/" target="_blank" rel="noopener">https://www.docker.com/</a></li><li>Gitea <a href="https://gitea.io/en-us/" target="_blank" rel="noopener">https://gitea.io/en-us/</a></li><li>commandの実施は基本的にroot権限で行うものとする</li></ul><h1 id="CentOS7"><a href="#CentOS7" class="headerlink" title="CentOS7"></a>CentOS7</h1><p>OSのインストールと社内環境における初期設定の手順を下記に記載する。</p><h2 id="OSインストール"><a href="#OSインストール" class="headerlink" title="OSインストール"></a>OSインストール</h2><p>基本的に下記サイトの手順に従いOSのインストールを行う。ネットワークとホスト名は事前に社内申請したIPやホスト名を用いる。</p><ul><li><a href="https://www.server-world.info/query?os=CentOS_7&p=install" target="_blank" rel="noopener">ServerWorld</a></li></ul><h2 id="初期設定"><a href="#初期設定" class="headerlink" title="初期設定"></a>初期設定</h2><p>sshで接続できるようにfirewallを無効にする。</p><pre><code class="bash">$ systemctl stop firewalld 
+$ systemctl disable firewalld</code></pre><p><strong>以降の作業はすべてssh接続して行う</strong></p><p>社内サーバーのためSELinuxを無効にする。</p><pre><code class="bash">$ vi /etc/selinux/config
+
+SELINUX=disabled   # disabled に変更
+
+$ reboot</code></pre><h2 id="プロキシ設定"><a href="#プロキシ設定" class="headerlink" title="プロキシ設定"></a>プロキシ設定</h2><p>アプリケーションのインストールと更新ができるようにプロキシ設定を行う。</p><pre><code class="bash">$ vi /etc/profile
+
+# 最終行に追記
+USER_NAME=&quot;****&quot;
+PASSWORD=&quot;****&quot;
+PROXY_HOST=&quot;****&quot;
+PROXY_PORT=&quot;****&quot;
+PROXY_URL=&quot;http://$USER_NAME:$PASSWORD@$PROXY_HOST:$PROXY_PORT&quot;
+export HTTP_PROXY=$PROXY_URL
+export HTTPS_PROXY=$PROXY_URL
+export FTP_PROXY=$PROXY_URL
+export http_proxy=$PROXY_URL
+export https_proxy=$PROXY_URL
+export ftp_proxy=$PROXY_URL
+
+$ source /etc/profile
+</code></pre><p>プロキシ設定後にシステム最新化できるかどうか、更新commandを実行する。</p><pre><code class="bash">$ yum -y update </code></pre><h2 id="ドメイン参加"><a href="#ドメイン参加" class="headerlink" title="ドメイン参加"></a>ドメイン参加</h2><p>ドメイン参加する必要性あるかどうかを別にして、一応手順を記載します。</p><p>前提</p><ul><li>DNSが既に設定済み</li></ul><pre><code class="bash">## 必要モジュールwinbind一式インストール
+ $ yum -y install realmd sssd oddjob oddjob-mkhomedir adcli samba-common samba-common-tools krb5-workstation
+
+
+## ドメイン参加
+ $ realm discover {Active Directoryドメイン}
+ $ realm join {Active Directoryドメイン} -U {自身のドメインアカウント}
+
+## 自身のドメインアカウント存在確認
+id {Active Directoryドメイン}\\{自身のドメインアカウント}
+
+## ドメイン名を省略したい場合は、以下のように設定します
+ $ vi /etc/sssd/sssd.conf
+use_fully_qualified_names = False
+
+ $ systemctl restart sssd
+
+## ユーザーにsudo権限付与
+ $ usermod -aG wheel {自身のドメインアカウント}</code></pre><h1 id="Docker"><a href="#Docker" class="headerlink" title="Docker"></a>Docker</h1><p>dockerのインストールとプロキシ設定の手順を下記に記載する。</p><h2 id="Docker-インストール"><a href="#Docker-インストール" class="headerlink" title="Docker インストール"></a>Docker インストール</h2><p>CentOSの公式リポジトリからdockerインストールを行う。</p><pre><code class="bash">$ yum -y install docker
+$ systemctl start docker
+$ systemctl enable docker</code></pre><h2 id="Docker-プロキシ設定"><a href="#Docker-プロキシ設定" class="headerlink" title="Docker プロキシ設定"></a>Docker プロキシ設定</h2><p>dockerはOSのシステム環境変数を読み込まないため、dockerからイメージを取得するためにdockerのプロキシ設定を行う必要がある。</p><pre><code class="bash">$ mkdir /etc/systemd/system/docker.service.d
+$ vim /etc/systemd/system/docker.service.d/http-proxy.conf
+
+## 下記を追加
+[Service]
+Environment=&quot;HTTP_PROXY=http://&lt;user&gt;:&lt;pass&gt;@&lt;proxy_host&gt;:&lt;proxy_port&gt;&quot; &quot;HTTPS_PROXY=http://&lt;user&gt;:&lt;pass&gt;@&lt;proxy_host&gt;:&lt;proxy_port&gt;&quot; &quot;NO_PROXY=localhost&quot;
+
+$ systemctl daemon-reload
+$ systemctl restart docker</code></pre><p>上記の設定が完了後にdockerが実行できるかどうかを確認する。Hello-worldが正常に表示できればOK。</p><pre><code class="bash">$ docker run hello-world</code></pre><h2 id="Docker-compose-インストール"><a href="#Docker-compose-インストール" class="headerlink" title="Docker-compose インストール"></a>Docker-compose インストール</h2><p>docker Compose をインストールすると、複数コンテナーの定義や実行が容易になるため、docker扱う上では必須なのでインストールしておく。</p><pre><code class="bash">## docker composeのリポジトリを追加
+$ yum -y install epel-release
+$ sed -i -e &quot;s/enabled=1/enabled=0/g&quot; /etc/yum.repos.d/epel.repo
+
+## docker composeインストール
+$ yum --enablerepo=epel -y install python2-pip
+$ pip install docker-compose</code></pre><h1 id="Gitea"><a href="#Gitea" class="headerlink" title="Gitea"></a>Gitea</h1><p>giteaは非常に軽量のSCMサーバ。Gogsからforkしたオープンソースソフトウェアで、バイナリファイルが簡単に作成できる「Go」言語で記述されているため、簡単にインストールできる。</p><p>操作方法もほとんどGithubと同じ、GitHub使いには迷うことなく使える。</p><h3 id="Giteaのインストール"><a href="#Giteaのインストール" class="headerlink" title="Giteaのインストール"></a>Giteaのインストール</h3><p>docker-composeを用いて、gitea + mysqlの構成でインストールを行う。</p><pre><code class="bash">## docker giteaのフォルダを作成
+$ mkdir /home/docker/gitea
+$ cd /home/docker/gitea
+
+## docker composeの構成ファイルを作成
+$ vi docker-compose.yml</code></pre><p>docker-compose.ymlファイルをvimで編集してもいいが、ローカルで編集してからsftpでサーバーに送ることをお勧めする。</p><pre><code class="yml">version: &quot;2&quot;
+networks:
+  gitea:
+    external: false
+
+services:
+  server:
+    image: gitea/gitea:latest
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=mysql
+      - DB_HOST=db:3306
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+      - TZ=&quot;Asia/Tokyo&quot;
+    restart: always
+    networks:
+      - gitea
+    volumes:
+      - ./gitea:/data
+    ports:
+       - &quot;3000:3000&quot;
+       - &quot;10022:22&quot;
+    depends_on:
+       - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=gitea
+      - MYSQL_USER=gitea
+      - MYSQL_PASSWORD=gitea
+      - MYSQL_DATABASE=gitea
+    networks:
+      - gitea
+    volumes:
+      - ./mysql:/var/lib/mysql</code></pre><h2 id="アプリ起動"><a href="#アプリ起動" class="headerlink" title="アプリ起動"></a>アプリ起動</h2><p>docker composeを実行して、アプリケーションを立ち上げる</p><pre><code class="bash">$ cd /home/docker/gitea
+
+## 起動
+$ docker-compose up -d
+
+## コンテナが起動していることを確認
+$ docker ps</code></pre><h2 id="Giteaの初期設定"><a href="#Giteaの初期設定" class="headerlink" title="Giteaの初期設定"></a>Giteaの初期設定</h2><p>あとは 自分で設定した http://ホスト名:ポート番号 にアクセスして初期設定を行う。</p><p>設定を変更したいときは公式リファレンスに従い、下記ファイルを編集する。</p><ul><li>/home/docker/gitea/gitea/gitea/conf/app.ini</li></ul><p>編集後にアプリを再起動することをお忘れなく。</p><pre><code class="bash">$ docker-compose reatart</code></pre></section></article><section class="prev-next card slide-in-right"><a href="/2019/08/27/other/blog_move/" class="link prev" title="Blogを移管しました"><span class="hover-underline-animation">&larr; Blogを移管しました</span> </a><a href="/2018/08/04/other/coding_forever/" class="link next" title="あなたはいつまでコーディングするの？"><span class="hover-underline-animation">あなたはいつまでコーディングするの？ &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CentOS7"><span class="toc-text">CentOS7</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OSインストール"><span class="toc-text">OSインストール</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#初期設定"><span class="toc-text">初期設定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#プロキシ設定"><span class="toc-text">プロキシ設定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ドメイン参加"><span class="toc-text">ドメイン参加</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker"><span class="toc-text">Docker</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-インストール"><span class="toc-text">Docker インストール</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-プロキシ設定"><span class="toc-text">Docker プロキシ設定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-compose-インストール"><span class="toc-text">Docker-compose インストール</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Gitea"><span class="toc-text">Gitea</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Giteaのインストール"><span class="toc-text">Giteaのインストール</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#アプリ起動"><span class="toc-text">アプリ起動</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Giteaの初期設定"><span class="toc-text">Giteaの初期設定</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core MVC 階層化アーキテクチャ Chap0 (ScaffoldからC.R.U.D操作を理解する) - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core MVC 階層化アーキテクチャ Chap0 (ScaffoldからC.R.U.D操作を理解する)</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 12 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><code>ASP.NET Core MVC</code> を用いて開発する際に、間違った実装方法をする人をときどきみかけます。</p><p>確かに<code>ASP.NET Core MVC</code> はJavaのSpring Bootと比べ、初心者には優しい作りになっています。</p><p>何せScaffold機能提供しておりますので、最初のひな型を自動的に生成することができます。しかし、そのひな型のアーキテクチをそのまま用いて実装し続けると、モジュール間の疎結合や関心の分離の原則が失われ、機能が増えるたびにどんどんメンテナンスしにくいプログラムになる恐れがあります。</p><p>また、Web Formsしか経験ない開発者にとって、MVCへシフトすることにあたって新たに覚える必要な観念が多々あります。</p><p>例)</p><ul><li>オブジェクト指向</li><li>SOLID原則</li><li>ORM</li><li>Linq</li><li>DI (Dependency Injection)</li><li>非同期</li></ul><p>Web Formsの知識である<strong>データ操作</strong>(DataSet、DataTable)や<strong>フロント側</strong>（サーバーコントロールによるコードビハインド）はMVCでは一切使いませんので、学習コストがそれ相応にあると覚悟したほうがいいと思います。</p><p>でも、諦めることなかれ。</p><p>幸運なことに、ここ何年Microsoft公式リファレンスがかなり充実するようになって、学習リソースは探そうと思えばいくらでもあります。</p><p>これらの学習リソースあるにも関わらず、多くの開発者は公式リファレンスをスキップして、今までの経験則を元にいきなり実装し始めてしまいます。</p><p>今回は最も基本的なScaffoldからCRUD操作(Create,Read,Update,Delete)を用いて、<code>ASP.NET Core MVC</code> の仕組みを理解して、階層化アーキテクチャを実装することにおける前提知識を身に着けます。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><p>今回はScaffoldを使って自動生成されたコードの中身を解説していきます。</p><h3 id="1-開発環境"><a href="#1-開発環境" class="headerlink" title="1. 開発環境"></a>1. 開発環境</h3><ul><li>開発ツール : <strong>Visual Studio Code</strong> or <strong>Visual Studio 2019</strong></li><li>.NET Core Version : <strong>3.0</strong></li><li>RDB : SQL Server LocalDB</li><li>ORM : EF Core</li><li>データベース : <a href="https://archive.codeplex.com/?p=northwinddatabase" target="_blank" rel="noopener">Northwind</a></li></ul><h2 id="プロジェクト作成"><a href="#プロジェクト作成" class="headerlink" title="プロジェクト作成"></a>プロジェクト作成</h2><h3 id="1-ソリューション作成"><a href="#1-ソリューション作成" class="headerlink" title="1. ソリューション作成"></a>1. ソリューション作成</h3><p>今後の階層化アーキテクチャを実装するため、最初にソリューションフォルダを作成し、ソリューションファイルを作成します。</p><pre><code class="bash">mkdir ds.NorthwindApp
+
+cd ds.NorthwindApp
+
+dotnet new sln -n ds.NorthwindApp</code></pre><h3 id="2-MVCプロジェクト作成"><a href="#2-MVCプロジェクト作成" class="headerlink" title="2. MVCプロジェクト作成"></a>2. MVCプロジェクト作成</h3><p>コマンドを用いてMVCプロジェクトを作成し、プロジェクトをソリューションに加えます。</p><pre><code class="bash">dotnet new mvc -n ds.NorthwindApp.Web
+
+dotnet sln add ds.NorthwindApp.Web</code></pre><h2 id="Scaffoldでコード自動生成"><a href="#Scaffoldでコード自動生成" class="headerlink" title="Scaffoldでコード自動生成"></a>Scaffoldでコード自動生成</h2><h3 id="1-ScaffoldからDbContextのEntityを作成"><a href="#1-ScaffoldからDbContextのEntityを作成" class="headerlink" title="1. ScaffoldからDbContextのEntityを作成"></a>1. ScaffoldからDbContextのEntityを作成</h3><p>プロジェクトフォルダに入ります。</p><pre><code class="bash">cd .ds.NorthwindApp.Web</code></pre><p>Scaffoldコマンド実行できるようにdotnet toolをインストールします。</p><pre><code class="bash">dotnet tool install --global dotnet-ef</code></pre><p>プロジェクトに必要なパッケージをインストールします。</p><pre><code class="bash">dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer</code></pre><p>LocalDBの接続情報を使ってScaffoldコマンドを実行します。</p><pre><code class="bash">dotnet ef dbcontext scaffold &quot;Server=(localdb)\mssqllocaldb;Database=Northwind;Trusted_Connection=True;&quot; 
+Microsoft.EntityFrameworkCore.SqlServer 
+-c NorthwindContext -o Models -d --schema dbo --use-database-names -f</code></pre><p>上記のコマンドを実行すると、ModelsフォルダにDbContexとEntityクラスが作成されます。</p><h3 id="2-接続文字列の修正"><a href="#2-接続文字列の修正" class="headerlink" title="2. 接続文字列の修正"></a>2. 接続文字列の修正</h3><p>Scaffoldで自動生成されたdbContextに接続文字列がそのまま書かれています。非常に非セキュアのため、appsettings.jsonに接続文字列を定義するように修正します。</p><ul><li><p>NorthwindContext.cs</p><p>OnConfiguringメソッドの中身を削除します。</p><pre><code class="cs">  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+  {
+  }</code></pre></li><li><p>appsettings.json</p><pre><code class="json">  {
+      &quot;Logging&quot;: {
+          &quot;LogLevel&quot;: {
+              &quot;Default&quot;: &quot;Information&quot;,
+              &quot;Microsoft&quot;: &quot;Warning&quot;,
+              &quot;Microsoft.Hosting.Lifetime&quot;: &quot;Information&quot;
+          }
+      },
+      &quot;AllowedHosts&quot;: &quot;*&quot;,
+      &quot;ConnectionStrings&quot;: {
+          &quot;Northwind&quot;: &quot;Server=(localdb)\\mssqllocaldb;Database=Northwind;Trusted_Connection=True;&quot;
+      }
+  }</code></pre></li><li><p>Startup.cs</p><pre><code class="cs">  public void ConfigureServices(IServiceCollection services)
+  {
+      services.AddControllersWithViews();
+      services.AddDbContext&lt;NorthwindContext&gt;(option =&gt;
+          option.UseSqlServer(Configuration.GetConnectionString(&quot;Northwind&quot;))
+      );
+  }</code></pre></li></ul><h3 id="3-Controller-amp-Viewの作成"><a href="#3-Controller-amp-Viewの作成" class="headerlink" title="3. Controller &amp; Viewの作成"></a>3. Controller &amp; Viewの作成</h3><p>dotnet cliの必要モジュールをインストールします。</p><pre><code class="bash">dotnet tool install -g dotnet-aspnet-codegenerator</code></pre><p>必要パッケージをプロジェクトにインストールします。</p><pre><code class="bash">dotnet add package Microsoft.VisualStudio.Web.CodeGeneration.Design</code></pre><p>Controllerを自動生成します。</p><pre><code class="bash">dotnet aspnet-codegenerator controller -name CustomersController -m Customers -dc  NorthwindContext -outDir Controllers -udl -scripts -f
+
+dotnet aspnet-codegenerator controller -name SuppliersController -m Suppliers -dc  NorthwindContext -outDir Controllers -udl -scripts -f</code></pre><p>上記のコマンドを実行した結果、ControllersフォルダとViewsフォルダにEnityクラスに対応したCRUD操作できるコードが自動生成されます。</p><h2 id="Scaffoldされたコードの解説"><a href="#Scaffoldされたコードの解説" class="headerlink" title="Scaffoldされたコードの解説"></a>Scaffoldされたコードの解説</h2><p>Scaffoldによる自動生成されたCustomersのCRUD操作のコードを解説していきます。</p><h3 id="1-Index-一覧"><a href="#1-Index-一覧" class="headerlink" title="1. Index (一覧)"></a>1. Index (一覧)</h3><p>DI (Dependency Injection)によって、CustomersControllerではDbContextが注入され、<br>NorthwindContextオブジェクトを用いてデータ参照・操作が可能になります。</p><p>CustomersController.cs</p><pre><code class="cs">public class CustomersController : Controller
+{
+    private readonly NorthwindContext _context;
+
+    public CustomersController(NorthwindContext context)
+    {
+        _context = context;
+    }
+
+    public async Task&lt;IActionResult&gt; Index()
+    {
+        return View(await _context.Customers.ToListAsync());
+    }</code></pre><p>Indexに対応するViewは<code>Views/Customers/Index.cshtml</code> です。</p><ul><li><p>画面</p><p><img src="/images/TieredArchitecture/chap0/2019-10-08-13-52-44.png" alt></p></li></ul><p><code>ASP.NET Core MVC</code> はRazorのHtml Helperに加え、Tag Helperを使用できます。<br>下記のようにデータのidの対応したリンクのHTMLが生成されます。</p><ul><li><p>Razor (cshtml)</p><pre><code class="html">  &lt;td&gt;
+      &lt;a asp-action=&quot;Edit&quot; asp-route-id=&quot;@item.CustomerID&quot;&gt;Edit&lt;/a&gt; |
+      &lt;a asp-action=&quot;Details&quot; asp-route-id=&quot;@item.CustomerID&quot;&gt;Details&lt;/a&gt; |
+      &lt;a asp-action=&quot;Delete&quot; asp-route-id=&quot;@item.CustomerID&quot;&gt;Delete&lt;/a&gt;
+  &lt;/td&gt;</code></pre></li><li><p>アプリ実行時に生成されるHTML</p><pre><code class="html">  &lt;td&gt;
+      &lt;a href=&quot;/Customers/Edit/ALFKI&quot;&gt;Edit&lt;/a&gt; |
+      &lt;a href=&quot;/Customers/Details/ALFKI&quot;&gt;Details&lt;/a&gt; |
+      &lt;a href=&quot;/Customers/Delete/ALFKI&quot;&gt;Delete&lt;/a&gt;
+  &lt;/td&gt;</code></pre></li></ul><h3 id="2-Details-詳細"><a href="#2-Details-詳細" class="headerlink" title="2. Details (詳細)"></a>2. Details (詳細)</h3><p>Detailsメソッドはidに応じて処理を行います。</p><ul><li>idもしくはidに対応するデータが存在しない場合、404にレスポンスを返します。</li><li>データが存在する場合、詳細画面を表示します。</li></ul><pre><code class="cs">public async Task&lt;IActionResult&gt; Details(string id)
+{
+    if (id == null)
+    {
+        return NotFound();
+    }
+
+    var customers = await _context.Customers
+        .FirstOrDefaultAsync(m =&gt; m.CustomerID == id);
+    if (customers == null)
+    {
+        return NotFound();
+    }
+
+    return View(customers);
+}</code></pre><p>Details.cshtmlの@modelはCustomersクラスにデータバインディングしており、<br>Indexと違ってIEnumerable<t>を用いていません。</t></p><pre><code class="html">@model ds.NorthwindApp.Web.Models.Customers
+
+@{
+    ViewData[&quot;Title&quot;] = &quot;Details&quot;;
+}</code></pre><p>画面</p><p><img src="/images/TieredArchitecture/chap0/2019-10-09-16-33-44.png" alt></p><h3 id="3-Edit-編集"><a href="#3-Edit-編集" class="headerlink" title="3. Edit (編集)"></a>3. Edit (編集)</h3><p>EditはGetとPostそれぞれに対応したActionがあります。</p><ul><li>編集画面表示</li><li>データ更新</li></ul><pre><code class="cs">public async Task&lt;IActionResult&gt; Edit(string id)
+{
+    if (id == null)
+    {
+        return NotFound();
+    }
+
+    var customers = await _context.Customers.FindAsync(id);
+    if (customers == null)
+    {
+        return NotFound();
+    }
+    return View(customers);
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; Edit(string id, 
+    [Bind(&quot;CustomerID,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax&quot;)] Customers customers)
+{
+    if (id != customers.CustomerID)
+    {
+        return NotFound();
+    }
+
+    if (ModelState.IsValid)
+    {
+        try
+        {
+            _context.Update(customers);
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!CustomersExists(customers.CustomerID))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
+        }
+        return RedirectToAction(nameof(Index));
+    }
+    return View(customers);
+}</code></pre><p>Viewのcshtmlに関してはTagヘルパーによって送信フォーム(<code>&lt;form asp-action=&quot;Edit&quot;&gt;</code>)があります。</p><p>Edit.cshtml</p><pre><code class="html">&lt;!-- 送信フォーム--&gt;
+&lt;form asp-action=&quot;Edit&quot;&gt;
+
+    &lt;div asp-validation-summary=&quot;ModelOnly&quot; class=&quot;text-danger&quot;&gt;&lt;/div&gt;
+    &lt;input type=&quot;hidden&quot; asp-for=&quot;CustomerID&quot; /&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label asp-for=&quot;CompanyName&quot; class=&quot;control-label&quot;&gt;&lt;/label&gt;
+        &lt;input asp-for=&quot;CompanyName&quot; class=&quot;form-control&quot; /&gt;
+        &lt;span asp-validation-for=&quot;CompanyName&quot; class=&quot;text-danger&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label asp-for=&quot;ContactName&quot; class=&quot;control-label&quot;&gt;&lt;/label&gt;
+        &lt;input asp-for=&quot;ContactName&quot; class=&quot;form-control&quot; /&gt;
+        &lt;span asp-validation-for=&quot;ContactName&quot; class=&quot;text-danger&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 途中省略--&gt;
+
+
+    &lt;!-- submit--&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Save&quot; class=&quot;btn btn-primary&quot; /&gt;
+    &lt;/div&gt;
+&lt;/form&gt;</code></pre><p>実際に生成されるHTML</p><pre><code class="html">&lt;!-- 送信フォーム--&gt;
+&lt;form action=&quot;/Customers/Edit/ALFKI&quot; method=&quot;post&quot; novalidate=&quot;novalidate&quot;&gt;
+
+    &lt;input type=&quot;hidden&quot; data-val=&quot;true&quot; data-val-length=&quot;The field CustomerID must be a string with a maximum length of 5.&quot; data-val-length-max=&quot;5&quot; id=&quot;CustomerID&quot; name=&quot;CustomerID&quot; value=&quot;ALFKI&quot;&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label class=&quot;control-label&quot; for=&quot;CompanyName&quot;&gt;CompanyName&lt;/label&gt;
+        &lt;input class=&quot;form-control&quot; type=&quot;text&quot; data-val=&quot;true&quot; data-val-length=&quot;The field CompanyName must be a string with a maximum length of 40.&quot; data-val-length-max=&quot;40&quot; data-val-required=&quot;The CompanyName field is required.&quot; id=&quot;CompanyName&quot; maxlength=&quot;40&quot; name=&quot;CompanyName&quot; value=&quot;Alfreds Futterkiste&quot;&gt;
+        &lt;span class=&quot;text-danger field-validation-valid&quot; data-valmsg-for=&quot;CompanyName&quot; data-valmsg-replace=&quot;true&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;label class=&quot;control-label&quot; for=&quot;ContactName&quot;&gt;ContactName&lt;/label&gt;
+        &lt;input class=&quot;form-control&quot; type=&quot;text&quot; data-val=&quot;true&quot; data-val-length=&quot;The field ContactName must be a string with a maximum length of 30.&quot; data-val-length-max=&quot;30&quot; id=&quot;ContactName&quot; maxlength=&quot;30&quot; name=&quot;ContactName&quot; value=&quot;Maria Anders&quot;&gt;
+        &lt;span class=&quot;text-danger field-validation-valid&quot; data-valmsg-for=&quot;ContactName&quot; data-valmsg-replace=&quot;true&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;!-- 途中省略--&gt;
+
+    &lt;div class=&quot;form-group&quot;&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Save&quot; class=&quot;btn btn-primary&quot;&gt;
+    &lt;/div&gt;
+
+    &lt;input name=&quot;__RequestVerificationToken&quot; type=&quot;hidden&quot; value=&quot;CfDJ8HiC10LQMAlKrZRSsHv9vhLoQ9AJ5DIGKL1iaIzKyzzDmSK0PGVMQBG3OssEmg2dfuiPFuE9b473ufEbvuGA6zJ93yd4ib3m-4zLuM41lUvQ1TcdsyekFknx-y1yoiROKlOW9WI4DevQ-E7K46QZP_w&quot;&gt;
+&lt;/form&gt;</code></pre><p>画面</p><p><img src="/images/TieredArchitecture/chap0/2019-10-09-16-34-03.png" alt></p><h3 id="4-Create-新規作成"><a href="#4-Create-新規作成" class="headerlink" title="4. Create (新規作成)"></a>4. Create (新規作成)</h3><p>Editとほぼ作りが同様です。GetとPostそれぞれに対応したActionがあります。</p><ul><li>新規画面表示</li><li>データ更新</li></ul><pre><code class="cs">public IActionResult Create()
+{
+    return View();
+}
+
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; Create([Bind(&quot;CustomerID,CompanyName,ContactName,ContactTitle,Address,City,Region,PostalCode,Country,Phone,Fax&quot;)] Customers customers)
+{
+    if (ModelState.IsValid)
+    {
+        _context.Add(customers);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+    return View(customers);
+}</code></pre><h3 id="5-Delete-削除"><a href="#5-Delete-削除" class="headerlink" title="5. Delete (削除)"></a>5. Delete (削除)</h3><p>DeleteはAction（Get,Post）２つありますが、メソッド名が違います。<br>何故なら、２つのActionの戻り値とパラメータが同じため、同じ名前のメソッドを命名できません。</p><ul><li>Delete(string id) : 一覧画面よりIDを受け取り対応したデータの削除確認画面を表示</li><li>DeleteConfirmed(string id) : 削除確認画面よりIDを受け取り、対象データを削除</li></ul><p>DeleteConfirmedにアノテーション<br><code>[HttpPost, ActionName(&quot;Delete&quot;)]</code> がついているため、２つのActionのURLは同じです。</p><pre><code class="cs">public async Task&lt;IActionResult&gt; Delete(string id)
+{
+    if (id == null)
+    {
+        return NotFound();
+    }
+
+    var customers = await _context.Customers
+        .FirstOrDefaultAsync(m =&gt; m.CustomerID == id);
+    if (customers == null)
+    {
+        return NotFound();
+    }
+
+    return View(customers);
+}
+
+[HttpPost, ActionName(&quot;Delete&quot;)]
+[ValidateAntiForgeryToken]
+public async Task&lt;IActionResult&gt; DeleteConfirmed(string id)
+{
+    var customers = await _context.Customers.FindAsync(id);
+    _context.Customers.Remove(customers);
+    await _context.SaveChangesAsync();
+    return RedirectToAction(nameof(Index));
+}</code></pre><p>Delete.cshtml</p><pre><code class="html">&lt;!-- 削除送信フォーム--&gt;
+&lt;form asp-action=&quot;Delete&quot;&gt;
+    &lt;input type=&quot;hidden&quot; asp-for=&quot;CustomerID&quot; /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;Delete&quot; class=&quot;btn btn-danger&quot; /&gt; |
+    &lt;a asp-action=&quot;Index&quot;&gt;Back to List&lt;/a&gt;
+&lt;/form&gt;</code></pre><p>画面</p><p><img src="/images/TieredArchitecture/chap0/2019-10-09-16-51-16.png" alt></p><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>Scaffoldを用いれば短時間でCRUD操作のWebアプリケーションを実装できますが、<br>実業務は往々にして複雑のため、Scaffoldを用いることはあまりありません。</p><p>しかし、<code>ASP.NET Core MVC</code> の初学者はScaffoldでMVCフレームワークにおけるCRUD操作の概要を大体理解できます。</p><p>また、今回はMVCの留意すべき部分（Route設定、Modelのアノテーション、モデルバインディング、etc…）は特段解説していません。</p><p>これらの解説に関しては以前作成した<code>ASP.NET Core MVC</code> の入門コンテンツを参考にしていただければ幸いです。</p><ul><li><a href="https://dongsu.dev/2019/09/03/asp_net_core_mvc/basic/chap01/">ASP.NET Core 入門1 ASP.NET Coreを使って初めてのWebアプリを構築</a></li><li><a href="https://dongsu.dev/2019/09/04/asp_net_core_mvc/basic/chap02/">ASP.NET Core 入門2 ASP.NET Core MVCフレームワークを使ったプロジェクト構築</a></li><li><a href="https://dongsu.dev/2019/09/05/asp_net_core_mvc/basic/chap03/">ASP.NET Core 入門3 ASP.NET Core MVC ルーティング</a></li><li><a href="https://dongsu.dev/2019/09/06/asp_net_core_mvc/basic/chap04/">ASP.NET Core 入門4 ASP.NET Core MVC コントローラー</a></li><li><a href="https://dongsu.dev/2019/09/11/asp_net_core_mvc/basic/chap05/">ASP.NET Core 入門5 ASP.NET Core MVC ビューエンジンRazor</a></li><li><a href="https://dongsu.dev/2019/09/19/asp_net_core_mvc/basic/chap06/">ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト</a></li><li><a href="https://dongsu.dev/2019/09/27/asp_net_core_mvc/basic/chap07/">ASP.NET Core 入門7 ASP.NET Core MVC 部分ビュー</a></li><li><a href="https://dongsu.dev/2019/10/01/asp_net_core_mvc/basic/chap08/">ASP.NET Core 入門8 ASP.NET Core + Entity Framework CoreでDB接続</a></li><li><a href="https://dongsu.dev/2019/10/07/asp_net_core_mvc/basic/chap09/">ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ</a></li></ul><h3 id="ちょっとだけ愚痴"><a href="#ちょっとだけ愚痴" class="headerlink" title="ちょっとだけ愚痴"></a>ちょっとだけ愚痴</h3><p><code>ASP.NET Core MVC</code> とは限らず、１つの技術 or フレームワークは数時間の学習でマスターできる代物ではありません。</p><p>特にWeb Formsしか作ったことがない開発者にとって多くの固定概念（手続き型プログラミング、コードビハインドetc…）を打ち破り、時間をかけて学習し、苦しい過程を乗り越える必要あります。</p><p>※私もMSDOS、Web Formsしか経験ないときにMVCを触ってかなり戸惑いました。</p><p>新技術を習得する際に急ぎは禁物です。<br>いきなり新技術をプロジェクトに適応しようとしてもうまくいきません。<br>なぜなら、その技術の基本的な仕組み（何ができる、何ができない）すらわからない状態では何しても無駄です。</p><p>SIerのプロジェクトでよくあることですが、学習時間を設けないまま、いきなり新技術を使って期限内にプロジェクト遂行を命じます。</p><p>当然、開発者は問題に直面したときにGoogle検索に頼って問題を解決する傾向があります。</p><ul><li><p>検索 → 自分に一番近い事象発見 → コピペ → デバッグ</p><p>上記を繰り返し</p></li></ul><p>確かに、そうしないと期限に間に合いません。</p><p>その結果的として、その開発者はプロジェクトを通じて成長があまり得られません。</p><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/ds-Mvc-Core/tree/master/ds.NorthwindApp_Part0" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/10/15/other/libman_proxy/" class="link prev" title="Libmanのプロキシ経由接続"><span class="hover-underline-animation">&larr; Libmanのプロキシ経由接続</span> </a><a href="/2019/10/07/asp_net_core_mvc/basic/chap09/" class="link next" title="ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ"><span class="hover-underline-animation">ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-開発環境"><span class="toc-text">1. 開発環境</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#プロジェクト作成"><span class="toc-text">プロジェクト作成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ソリューション作成"><span class="toc-text">1. ソリューション作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-MVCプロジェクト作成"><span class="toc-text">2. MVCプロジェクト作成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scaffoldでコード自動生成"><span class="toc-text">Scaffoldでコード自動生成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ScaffoldからDbContextのEntityを作成"><span class="toc-text">1. ScaffoldからDbContextのEntityを作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-接続文字列の修正"><span class="toc-text">2. 接続文字列の修正</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Controller-amp-Viewの作成"><span class="toc-text">3. Controller &amp; Viewの作成</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Scaffoldされたコードの解説"><span class="toc-text">Scaffoldされたコードの解説</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Index-一覧"><span class="toc-text">1. Index (一覧)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Details-詳細"><span class="toc-text">2. Details (詳細)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Edit-編集"><span class="toc-text">3. Edit (編集)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-Create-新規作成"><span class="toc-text">4. Create (新規作成)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-Delete-削除"><span class="toc-text">5. Delete (削除)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#まとめ"><span class="toc-text">まとめ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ちょっとだけ愚痴"><span class="toc-text">ちょっとだけ愚痴</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

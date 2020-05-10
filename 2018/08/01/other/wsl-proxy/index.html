@@ -1,0 +1,55 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>WSL + Dockerで汚れない環境を構築する - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">WSL + Dockerで汚れない環境を構築する</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2019-11-08">2019-11-08</time> </span><span>閲覧時間&#58; 3 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><ul><li>Hyper-V,WSLがすでに有効</li><li>Microsoft StoreからすでにUbuntuをインストール済み</li></ul><h2 id="WSL初期設定"><a href="#WSL初期設定" class="headerlink" title="WSL初期設定"></a>WSL初期設定</h2><h3 id="リポジトリミラーを日本に設定"><a href="#リポジトリミラーを日本に設定" class="headerlink" title="リポジトリミラーを日本に設定"></a>リポジトリミラーを日本に設定</h3><pre><code class="bash">sudo sed -i.bak -e &quot;s/http:\/\/archive\.ubuntu\.com/http:\/\/jp\.archive\.ubuntu\.com/g&quot; /etc/apt/sources.list</code></pre><h3 id="プロキシ設定"><a href="#プロキシ設定" class="headerlink" title="プロキシ設定"></a>プロキシ設定</h3><p>プロキシを有効or無効に切り替えられるようにする。俺はvim苦手なのでvscodeで編集する。</p><pre><code class="bash">code ~/.bashrc</code></pre><p>~/.bashrcの追記内容</p><pre><code class="bash">function proxy_on(){
+  USERNAME=&quot;UserName&quot;
+  PASSWORD=&quot;PassWord&quot;
+  HOST=&quot;XXX.XXX.XXX.XX&quot;
+  PORT=&quot;XX&quot;
+  USERDOMAIN=&quot;XXX.XX.co.jp&quot;
+
+  # 認証が必要なプロキシ
+  PROXY=&quot;http://$USERNAME:$PASSWORD@$HOST:$PORT&quot;
+
+  export HTTP_PROXY=$PROXY
+  export HTTPS_PROXY=$PROXY
+  export FTP_PROXY=$PROXY
+  export http_proxy=$PROXY
+  export https_proxy=$PROXY
+  export ftp_proxy=$PROXY
+
+  export NO_PROXY=&quot;localhost,120.0.0.1,$USERDOMAIN&quot;
+  export no_proxy=&quot;localhost,120.0.0.1,$USERDOMAIN&quot; 
+
+  echo -e &quot;\nProxy-related environment variables set.&quot;
+}
+
+function proxy_off(){
+  variables=(&quot;HTTP_PROXY&quot; &quot;HTTPS_PROXY&quot; &quot;FTP_PROXY&quot; &quot;NO_PROXY&quot;\
+           &quot;http_proxy&quot; &quot;https_proxy&quot; &quot;ftp_proxy&quot; &quot;no_proxy&quot;)
+
+  for i in &quot;${variables[@]}&quot;
+  do
+    unset $i
+  done
+
+  echo -e &quot;\nProxy-related environment variables removed.&quot;  
+}</code></pre><p>反映</p><pre><code class="bash">source ~/.bashrc</code></pre><p><code>proxy_on</code> と <code>proxy_off</code>　で切り替えできる。</p><pre><code class="bash"># プロキシ環境変数あり
+proxy_on
+env | grep -i proxy
+
+# プロキシ環境変数なし
+proxy_off
+env | grep -i proxy</code></pre><h3 id="ソフトウエア更新"><a href="#ソフトウエア更新" class="headerlink" title="ソフトウエア更新"></a>ソフトウエア更新</h3><p>sudoの場合、環境変数が適用できるようにオプション <code>-E</code> をつける。</p><pre><code class="bash">sudo -E apt -y update
+sudo -E apt -y upgrade</code></pre><p>日本語環境が必要ならインストールしておく</p><pre><code class="bash"># 日本語環境インストール
+sudo -E apt install language-pack-ja -y
+
+# メッセージを日本語
+sudo -E update-locale LANG=ja_JP.UTF-8
+
+# タイムゾーン
+# アジア→東京に設定する
+sudo -E dpkg-reconfigure tzdata
+
+# Linuxのコマンドのマニュアルも日本語化
+sudo -E apt -y install manpages-ja manpages-ja-dev</code></pre><h2 id="Docker-for-Windows導入＆設定"><a href="#Docker-for-Windows導入＆設定" class="headerlink" title="Docker for Windows導入＆設定"></a>Docker for Windows導入＆設定</h2><p>docker hubのアカウントを作って、<a href="https://docs.docker.com/docker-for-windows/install/" target="_blank" rel="noopener">公式</a>からインストーラをダウンロードしてインストールする。<br>特に迷うことはない。</p><h3 id="初期設定"><a href="#初期設定" class="headerlink" title="初期設定"></a>初期設定</h3><p>WSLからwindos側のdockerを呼び出すため、<code>expose demon on tcp://localhost:2375 without TLS</code>にチェック</p><p><img src="/images/other/wsl-proxy/2019-11-08-10-57-17.png" alt></p><h3 id="Proxyの設定"><a href="#Proxyの設定" class="headerlink" title="Proxyの設定"></a>Proxyの設定</h3><p>docker for windows は Hyper-V の仮想ネットワークスイッチを使っており、proxy serverのhost名を設定しても、名前解決してくれない。なのでproxy serverの<strong>IP</strong>を設定すること。</p><ul><li>http://{username}:{password}@{proxy server <strong>IP</strong>}:{proxy server port}</li></ul><p><img src="/images/other/wsl-proxy/2019-11-08-11-02-08.png" alt></p><h2 id="WSLのdocker導入-docker-for-windowsを動かす設定"><a href="#WSLのdocker導入-docker-for-windowsを動かす設定" class="headerlink" title="WSLのdocker導入+docker for windowsを動かす設定"></a>WSLのdocker導入+docker for windowsを動かす設定</h2><p>基本公式を参照してください。再インストールに備えてコマンドだけを残しておく</p><h3 id="Ubuntuのdockerインストール"><a href="#Ubuntuのdockerインストール" class="headerlink" title="Ubuntuのdockerインストール"></a>Ubuntuのdockerインストール</h3><p><a href="https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce" target="_blank" rel="noopener">公式</a></p><pre><code class="bash">sudo -E apt install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y</code></pre><pre><code class="bash">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -</code></pre><pre><code class="bash">sudo apt-key fingerprint 0EBFCD88</code></pre><pre><code class="bash">sudo add-apt-repository &quot;deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&quot;</code></pre><pre><code class="bash">sudo -E apt update -y
+sudo -E apt install docker-ce docker-ce-cli containerd.io -y</code></pre><h3 id="WSLからDocker-for-Windowsのdaemonへ接続できるようにする"><a href="#WSLからDocker-for-Windowsのdaemonへ接続できるようにする" class="headerlink" title="WSLからDocker for Windowsのdaemonへ接続できるようにする"></a>WSLからDocker for Windowsのdaemonへ接続できるようにする</h3><pre><code class="bash">echo &quot;export DOCKER_HOST=tcp://localhost:2375&quot; &gt;&gt; ~/.bashrc &amp;&amp; source ~/.bashrc</code></pre><h3 id="docker-compose"><a href="#docker-compose" class="headerlink" title="docker-compose"></a>docker-compose</h3><p><a href="https://docs.docker.com/compose/install/" target="_blank" rel="noopener">公式</a></p><pre><code class="bash">sudo curl -L &quot;https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose</code></pre></section></article><section class="prev-next card slide-in-right"><a href="/2018/08/02/other/sikaku/" class="link prev" title="本当にIT業界で資格は役に立たないのか？"><span class="hover-underline-animation">&larr; 本当にIT業界で資格は役に立たないのか？</span> </a><a class="link-disabled link next">それ以上ない &rarr;</a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WSL初期設定"><span class="toc-text">WSL初期設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#リポジトリミラーを日本に設定"><span class="toc-text">リポジトリミラーを日本に設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#プロキシ設定"><span class="toc-text">プロキシ設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ソフトウエア更新"><span class="toc-text">ソフトウエア更新</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker-for-Windows導入＆設定"><span class="toc-text">Docker for Windows導入＆設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#初期設定"><span class="toc-text">初期設定</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Proxyの設定"><span class="toc-text">Proxyの設定</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#WSLのdocker導入-docker-for-windowsを動かす設定"><span class="toc-text">WSLのdocker導入+docker for windowsを動かす設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ubuntuのdockerインストール"><span class="toc-text">Ubuntuのdockerインストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WSLからDocker-for-Windowsのdaemonへ接続できるようにする"><span class="toc-text">WSLからDocker for Windowsのdaemonへ接続できるようにする</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#docker-compose"><span class="toc-text">docker-compose</span></a></li></ol></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

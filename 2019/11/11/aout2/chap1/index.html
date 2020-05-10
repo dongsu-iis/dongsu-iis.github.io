@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>【読書メモ】The Art Of Unit Testing 2nd Edition - Chap1 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">【読書メモ】The Art Of Unit Testing 2nd Edition - Chap1</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2019-11-11">2019-11-11</time> </span><span>閲覧時間&#58; 3 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>ここ何年、アジャイル開発を導入しようとSIer企業がどんどん増えていますが、成功事例・実績がまだまだ目立たないのも事実です。</p><p>成功事例が少ない原因は企業文化が合わないなども考えられますが、個人的に一番の原因は<strong>アジャイル脳</strong>へシフトできていないかと思います。</p><p>技術基盤がまだ整っていない状態で、既存の開発手法・体制を無理やりアジャイルに嵌め込もうとすると破綻するのも納得できます。</p><p>アジャイル開発を行う上で<strong>自動化</strong>は必要不可欠のため、単体テストについてイチから勉強し直すという意味で、<a href="https://amzn.to/36R0tMt" target="_blank" rel="noopener">The Art of Unit Testing: with examples in C#</a>の読書メモを残していきたいと思います。</p><h2 id="単体テストの定義"><a href="#単体テストの定義" class="headerlink" title="単体テストの定義"></a>単体テストの定義</h2><ul><li>単体テスト : プログラム構成の最小のユニット（単位）を呼び出し、そのユニットの呼び出し結果が想定した結果と一致するかを検証するテスト</li><li>SUT : System Under Test、テスト対象のプログラムのことを指す</li></ul><p>単体テストを始める際に、一番難しいことは<strong>どういうのが良い単体テスト</strong>であるかを定義することです。</p><p>もし、単体テストの定義をわからないまま適当にテストコードを書くくらいなら、書かないほうがマシです。そうしたほうが少なくとも<strong>出来の悪い</strong>テストコードをメンテナンスする時間を節約できます。</p><h2 id="良い単体テストの特性"><a href="#良い単体テストの特性" class="headerlink" title="良い単体テストの特性"></a>良い単体テストの特性</h2><p>単体テストは以下の特性を備わっているはず。</p><ul><li>自動化されており、何度も実行できる</li><li>簡単に実装できる</li><li>二日目になっても存在価値がある（臨時的ではない）</li><li>誰でも実行できる</li><li>実行速度が早い</li><li>何度実行しても、実行結果が同じ（プロダクトコードが変わらない限り）</li><li>テスト対象のユニットを完全にコントロールすることができる</li><li>完全に分離されている</li><li>実行結果が失敗なら、「期待値は何か」、「問題点はどこか」などの情報がはっきりわかる</li></ul><p>それを踏まえて、自分が今まで行った”単体テスト”を思い返し、以下の質問に答えてみてください。</p><ul><li>2ヶ月前に書いた単体テストは今日実行しても当時と同じ結果得られるか？</li><li>2ヶ月前に書いた単体テストは、チームメンバーの誰が実行しても結果は一緒か？</li><li>数分で単体テストを実行し終えることができるか？</li><li>ボタン一つで全単体テストを実行できるか？</li><li>数分で単体テストを実装することが可能か？</li></ul><p>上記の質問に１つでも<strong>No</strong>があるなら、それは単体テストではないことを意味し、今まで単体テストをやっているつもりが、実は結合テストであることが多い。</p><h2 id="結合テスト"><a href="#結合テスト" class="headerlink" title="結合テスト"></a>結合テスト</h2><p>テストに本物のファイルやデータベースが必要ならそれは結合テスト領域をテストすることを意味しています。</p><p>結合テスト自体は悪いことではありません。単体テスト同じくらい重要ですが、ただし、この種のテストは本物のデータを扱うため、実行痕跡が消すことが難しく、完全にコントロールすることが難しい。</p><p>また、一回にテストすべきものが多すぎることも問題です。</p><p>車が壊れた場合、部品を一つ一つに問題ないことを確認できて初めて、部品同士の相互作用に問題ないかを確認するものです。</p><h2 id="デモ"><a href="#デモ" class="headerlink" title="デモ"></a>デモ</h2><p>テストフレームワークを使わなくても、単体テストを実装することが可能です。</p><h3 id="動作環境"><a href="#動作環境" class="headerlink" title="動作環境"></a>動作環境</h3><table><thead><tr><th>環境/ソフト</th><th>内容</th></tr></thead><tbody><tr><td>OS</td><td>Windows10 1903</td></tr><tr><td>.NET Core SDK</td><td>3.0.100</td></tr><tr><td>言語</td><td>C#</td></tr><tr><td>IDE</td><td>Visual Studio 2019</td></tr></tbody></table><h3 id="SUT"><a href="#SUT" class="headerlink" title="SUT"></a>SUT</h3><p>テスト対象プログラム作成します。</p><pre><code class="cs">using System;
+
+public class SimpleParser{
+
+    // 文字列を数値に型変換
+    public int ParseAndSum(string numbers){
+
+        // 文字数が0なら0
+        if (numbers.Length == 0)
+        {
+            return 0;
+        }
+
+        // &quot;,&quot;混在する場合エラー
+        if (!numbers.Contains(&quot;,&quot;))
+        {
+            return int.Parse(numbers);
+        }else{
+            throw new InvalidOperationException(&quot;I can only handle 0 or 1 numbers for now!&quot;);
+        }
+
+    }
+}</code></pre><h3 id="単体テスト"><a href="#単体テスト" class="headerlink" title="単体テスト"></a>単体テスト</h3><p>テスト対象をテストするプログラムを作成します。</p><pre><code class="cs">using System;
+
+public class SimpleParserTests
+{
+    // 空白文字列を渡し、0以外ならテスト失敗
+    public static void TestReturnZeroWhenEmptyString()
+    {
+        try
+        {
+            var p = new SimpleParser();
+            int result = p.ParseAndSum(string.Empty);
+            if (result != 0)
+            {
+                Console.WriteLine(
+                    @&quot;***SimpleParserTests.TestReturnsZeroWhenEmptyString: 
+-------
+Parse and sum should have returned 0 on an empty string&quot;
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+    }
+}</code></pre><h3 id="単体テスト呼び出しプログラム"><a href="#単体テスト呼び出しプログラム" class="headerlink" title="単体テスト呼び出しプログラム"></a>単体テスト呼び出しプログラム</h3><pre><code class="cs">using System;
+
+namespace chapter01
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                // 単体テスト実行
+                SimpleParserTests.TestReturnZeroWhenEmptyString();
+            }
+            catch (Exception ex)
+            {
+               Console.WriteLine(ex);
+            }
+        }
+    }
+}</code></pre><p>テストフレームワークを使えば補助機能を利用でき、もっと単体テスト実装しやすくなります。</p><p>単体テストを<strong>どうやって</strong>書くのかをわかったところで、単体テストは<strong>いつ</strong>書くべきかについて考えてみます。</p><h2 id="テスト駆動開発"><a href="#テスト駆動開発" class="headerlink" title="テスト駆動開発"></a>テスト駆動開発</h2><p>テスト駆動開発（TDD）はプロダクトコードを書く<strong>前</strong>に、テストコードを書くことがベストプラクティスと信じる開発手法です。</p><ul><li>TDDの流れ</li></ul><p><img src="/images/aout2/chap1/2019-11-11-14-36-03.png" alt="TDD-Flow"></p><p>TDDは開発において有意義ですが、その対価として学習コスト（学習時間、実践練習、良いコーディングスタイル）が高い。ですが、その学習コストは結果的に価値のあるものであることは間違いない。</p><h2 id="まとめ"><a href="#まとめ" class="headerlink" title="まとめ"></a>まとめ</h2><p>良い単体テストの定義は</p><ul><li>自動化されたプログラムである。他のプログラムを呼び出すことで、テスト対象コードのロジックを検証する</li><li>自動化テストフレームワークで実装されたテストコード</li><li>実装が容易</li><li>実行速度が早い</li><li>開発チームメンバーが誰が実行しても同じ結果を得られる</li></ul><p>出典</p><p><a href="https://amzn.to/36R0tMt" target="_blank" rel="noopener">The Art of Unit Testing: with examples in C#</a></p><p>コード</p><p><a href="https://github.com/dongsu-iis/ds-TheArtOfUnitTesting/tree/master/chapter01" target="_blank" rel="noopener">Github Repository</a></p></section></article><section class="prev-next card slide-in-right"><a href="/2019/11/12/asp_net_core_mvc/TieredArchitecture/chap4/" class="link prev" title="ASP.NET Core MVC 階層化アーキテクチャ Chap4 (データアクセスオブジェクトを抜き出しModel層を作成する)"><span class="hover-underline-animation">&larr; ASP.NET Core MVC 階層化アーキテクチャ Chap4 (データアクセスオブジェクトを抜き出しModel層を作成する)</span> </a><a href="/2019/11/09/other/leader_coding/" class="link next" title="プロジェクトマネージャーはコーディングすべきか?"><span class="hover-underline-animation">プロジェクトマネージャーはコーディングすべきか? &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#背景"><span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#単体テストの定義"><span class="toc-text">単体テストの定義</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#良い単体テストの特性"><span class="toc-text">良い単体テストの特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#結合テスト"><span class="toc-text">結合テスト</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#デモ"><span class="toc-text">デモ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#動作環境"><span class="toc-text">動作環境</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SUT"><span class="toc-text">SUT</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#単体テスト"><span class="toc-text">単体テスト</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#単体テスト呼び出しプログラム"><span class="toc-text">単体テスト呼び出しプログラム</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#テスト駆動開発"><span class="toc-text">テスト駆動開発</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#まとめ"><span class="toc-text">まとめ</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

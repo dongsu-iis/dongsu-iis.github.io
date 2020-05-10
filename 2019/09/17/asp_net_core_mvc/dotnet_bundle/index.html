@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core MVCでnpmを用いて静的コンテンツを管理 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core MVCでnpmを用いて静的コンテンツを管理</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 2 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><code>ASP.NET Core MVC</code> ではフロント側のパッケージはデフォルトBowerで管理されます。しかし、Bowwerは既にMicrosoft非推奨のため、フロント側のパッケージをnpmで管理する方法を記述します。</p><p>ほぼ自分用の備忘メモです。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-環境情報"><a href="#1-環境情報" class="headerlink" title="1. 環境情報"></a>1. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio 2019</td></tr><tr><td>NodeJs</td><td><a href="https://nodejs.org/ja/" target="_blank" rel="noopener">10.16.3 LTS</a></td></tr></tbody></table><h2 id="手順"><a href="#手順" class="headerlink" title="手順"></a>手順</h2><h3 id="1-プロジェクト作成"><a href="#1-プロジェクト作成" class="headerlink" title="1. プロジェクト作成"></a>1. プロジェクト作成</h3><p>dotnet cliにてMVCプロジェクトを作成します。</p><pre><code class="bash">dotnet new mvc -n ds.webApp</code></pre><h3 id="2-npmモジュールをインストール"><a href="#2-npmモジュールをインストール" class="headerlink" title="2. npmモジュールをインストール"></a>2. npmモジュールをインストール</h3><p>Visual Studioからnpmをインストールするできるように以下の拡張機能をインストールします。</p><ul><li><a href="https://marketplace.visualstudio.com/items?itemName=MadsKristensen.PackageInstaller" target="_blank" rel="noopener">Package Installer</a></li></ul><p>作成したプロジェクトを開き、プロジェクトを右クリックして「Quick Install Package」を選択します。</p><p><img src="/images/dotnet_bundle/2019-09-17-17-58-16.png" alt></p><p>必要なパッケージをタイプして、Installを押下します。</p><p><img src="/images/dotnet_bundle/2019-09-17-17-59-12.png" alt></p><p>すると、プロジェクトフォルダ配下に「node_modules」フォルダが作成され、その中にパッケージが入っています。</p><p><img src="/images/dotnet_bundle/2019-09-17-18-00-53.png" alt></p><h3 id="3-BuildBundlerMinifierで自動化"><a href="#3-BuildBundlerMinifierで自動化" class="headerlink" title="3. BuildBundlerMinifierで自動化"></a>3. BuildBundlerMinifierで自動化</h3><p>あとは「node_modules」の中身を「wwwroot」に移動すればいいですが、bundleを用いて自動化できるようにします。</p><p>dotnet cliにて、nugetからBuildBundlerMinifierをプロジェクトにインストールします。</p><pre><code class="bash">dotnet add package BuildBundlerMinifier</code></pre><p>プロジェクトは以下にbundleconfig.jsonを作成し、npmでインストールしたパッケージをwwwrootへ自動コピーできるように設定します。</p><ul><li><p>設定例(bundleconfig.json)</p><pre><code class="json">  [
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/bootstrap/dist/css/bootstrap.css&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/bootswatch/dist/superhero/bootstrap.css&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      },
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/bootstrap/dist/js/bootstrap.js&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/bootstrap/dist/js/bootstrap.js&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      },
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.js&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/bootstrap/dist/js/bootstrap.bundle.js&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      },
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/jquery/dist/jquery.js&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/jquery/dist/jquery.js&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      },
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/jquery-validation/dist/jquery.validate.js&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/jquery-validation/dist/jquery.validate.js&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      },
+      {
+          &quot;outputFileName&quot;: &quot;wwwroot/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js&quot;,
+          &quot;inputFiles&quot;: [
+              &quot;node_modules/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.js&quot;
+          ],
+          &quot;minify&quot;: {
+              &quot;enabled&quot;: true,
+              &quot;renameLocals&quot;: true
+          }
+      }
+  ]</code></pre></li></ul><p>これでプロジェクトをビルドするたびに、フロント側のパッケージも最新化されます。</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/19/asp_net_core_mvc/basic/chap06/" class="link prev" title="ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト"><span class="hover-underline-animation">&larr; ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト</span> </a><a href="/2019/09/11/asp_net_core_mvc/basic/chap05/" class="link next" title="ASP.NET Core 入門5 ASP.NET Core MVC ビューエンジンRazor"><span class="hover-underline-animation">ASP.NET Core 入門5 ASP.NET Core MVC ビューエンジンRazor &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-環境情報"><span class="toc-text">1. 環境情報</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手順"><span class="toc-text">手順</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-プロジェクト作成"><span class="toc-text">1. プロジェクト作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-npmモジュールをインストール"><span class="toc-text">2. npmモジュールをインストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-BuildBundlerMinifierで自動化"><span class="toc-text">3. BuildBundlerMinifierで自動化</span></a></li></ol></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門4 ASP.NET Core MVC コントローラー - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門4 ASP.NET Core MVC コントローラー</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 6 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><a href="https://dongsu.dev/2019/09/05/asp_net_core_mvc/basic/chap03">前回</a>に引き続き<code>ASP.NET Core</code>を学習メモです。今回は<code>ASP.NET Core MVC</code> の実質的な中心の部分であるコントローラーについて学んでいきます。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li>コントローラーの概要</li><li>コントローラーのアクションメソッド</li><li>コントローラーのアクション結果を表す型</li><li>コントローラーのアクションのパラメータマッピング</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.37.1</td></tr><tr><td>Browser</td><td>Google Chrome 76.0.3809.132</td></tr></tbody></table><h3 id="3-前提知識"><a href="#3-前提知識" class="headerlink" title="3. 前提知識"></a>3. 前提知識</h3><ul><li><a href="https://docs.microsoft.com/ja-jp/aspnet/core/mvc/overview?view=aspnetcore-2.2" target="_blank" rel="noopener">MVCフレームワーク</a></li></ul><h2 id="コントローラの概要"><a href="#コントローラの概要" class="headerlink" title="コントローラの概要"></a>コントローラの概要</h2><h3 id="1-コントローラーとは"><a href="#1-コントローラーとは" class="headerlink" title="1. コントローラーとは"></a>1. コントローラーとは</h3><p>MVC Webにおいて、コントローラーはリクエスト処理を全体を制御する役割を担っています。<br>コントローラーは入力データを捕捉し、ビジネス層とデータ層と取りまとめ、リクエストに基づいたレスポンスを返します。</p><p>入力データのフォーマットにはQueryString、FormData、HTTP Header、HTTP Bodyなどがあり、<br>レスポンスにはHTML、 JSON、XML、プレーンテキストなどがあります。</p><h3 id="2-コントローラーの定義"><a href="#2-コントローラーの定義" class="headerlink" title="2. コントローラーの定義"></a>2. コントローラーの定義</h3><p>すべてのコントローラーは基底クラスは<code>Microsoft.AspNetCore.Mvc.ControllerBase</code> を継承しており、ビューエンジンを使うためには<code>Microsoft.AspNetCore.Mvc.Controlle</code> を継承しています。</p><p>なので、上記のどちらかクラスを継承すれば、クラスがコントローラーとして扱えます。</p><h3 id="3-コントローラーの命名規則"><a href="#3-コントローラーの命名規則" class="headerlink" title="3. コントローラーの命名規則"></a>3. コントローラーの命名規則</h3><p>コントローラーはクラス名の後ろに<strong>Controller</strong>をつけることがMSが推奨するやり方です。</p><ul><li>HomeController</li><li>TestController</li></ul><p>Controllerを除いた部分がルーティングに対応し、検出されます。</p><p>以下がコントローラーの実装例です。</p><pre><code class="cs">// MS推奨
+public class HomeController : Controller
+{
+    //ControllerName=Home
+}
+
+public class HomeController : BaseController
+{
+    //ControllerName=Home
+}
+
+public class Test : Controller
+{
+    //ControllerName=Test
+}</code></pre><h2 id="コントローラーのアクションメソッド"><a href="#コントローラーのアクションメソッド" class="headerlink" title="コントローラーのアクションメソッド"></a>コントローラーのアクションメソッド</h2><h3 id="1-アクションメソッドとは"><a href="#1-アクションメソッドとは" class="headerlink" title="1. アクションメソッドとは"></a>1. アクションメソッドとは</h3><p>コントローラーのアクションメソッドは、コントローラーがリクエストを受信した後に、処理を行うメソッドです。リクエストURLのActionに対応したアクションメソッド呼び出し、処理結果を返します。</p><h3 id="2-アクションメソッドの定義"><a href="#2-アクションメソッドの定義" class="headerlink" title="2. アクションメソッドの定義"></a>2. アクションメソッドの定義</h3><p>アクションメソッドの定義例です。必ずパブリックメソッドでなければいけません。</p><pre><code class="cs">public class HomeController : Controller
+{
+    // /home/index 
+    //   or 
+    // /homeのリクエストに対応する
+    public IActionResult Index()
+    {
+        return Content(&quot;Hello World - by dongsu.dev&quot;);
+    }
+
+    // /home/testのリクエストに対応する
+    public string Test()
+    {
+        return &quot;test&quot;;
+    }
+
+    // /home/dosomethingのリクエストに対応する
+    public void DoSomething()
+    {
+        //DoSomething
+    }
+</code></pre><p>もし、パブリックメソッドを定義したけどリクエストを受け付けさせたくない場合、以下のアノテーションを追加すれば良いです。</p><pre><code class="cs">public class HomeController : Controller
+{
+    [NonAction]
+    public void LogicMethod(){
+
+    }
+}</code></pre><h3 id="3-アクションメソッドの戻り値"><a href="#3-アクションメソッドの戻り値" class="headerlink" title="3. アクションメソッドの戻り値"></a>3. アクションメソッドの戻り値</h3><p>アクションメソッドが生成する結果はさまざまです。<br>戻り値はIActionResultインターフェイスを実装する具体的な型がいろいろ定義されており、異なるコンテンツ形式を返せます。ここでMVCで良く扱うアクション結果の型をピックアップしてみました。</p><table><thead><tr><th>型</th><th>実装方法</th><th>説明</th></tr></thead><tbody><tr><td>ViewResult</td><td>View()</td><td>Razorエンジンが生成したHTMLコンテンツを返します</td></tr><tr><td>PartialViewResult</td><td>PartialView()</td><td>Razorエンジンが生成した部分ビューのHTMLコンテンツを返します</td></tr><tr><td>ContentResult</td><td>Content()</td><td>生のテキストコンテンツを返します</td></tr><tr><td>JsonResult</td><td>Json()</td><td>文字通りJSON文字列</td></tr><tr><td>FileResult</td><td>File()</td><td>ファイル内容をブラウザーに送信、内容はByte配列</td></tr><tr><td>RedirectResult</td><td>Redirect()</td><td>特定なURLへリダイレクトする</td></tr><tr><td>RedirectToRouteResult</td><td>RedirectToAction(), RedirectToRoute()</td><td>特定なコントローラーorアクションメソッドへリダイレクトする</td></tr></tbody></table><h2 id="アクション結果の実装例"><a href="#アクション結果の実装例" class="headerlink" title="アクション結果の実装例"></a>アクション結果の実装例</h2><p>まずはControllersフォルダ配下にActionResultTestController.csを作成します。内容は以下です。Controllerを継承することをお忘れなく…</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers
+{
+    public class ActionResultTestController : Controller
+    {
+
+    }
+}</code></pre><p>そして、テストしやすいためにStartup.csにルーティング設定をします。</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;ActionResultTest&quot;,
+    template: &quot;art/{action}&quot;,
+    defaults : new { controller = &quot;ActionResultTest&quot; }
+);</code></pre><h3 id="1-ContentResultの実装例"><a href="#1-ContentResultの実装例" class="headerlink" title="1. ContentResultの実装例"></a>1. ContentResultの実装例</h3><p>ActionResultTestControllerに以下のアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult ContentTest () {
+    return Content (&quot;Content Resutl Test&quot;);
+}</code></pre><p>アプリを起動し、URL{host:port}/art/contenttestをたたくと、Content Resutl Testが表示されるはずです。</p><h3 id="2-JsonResultの実装例"><a href="#2-JsonResultの実装例" class="headerlink" title="2. JsonResultの実装例"></a>2. JsonResultの実装例</h3><p>同じくアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult JsonTest () {
+    return Json (new { Message = &quot;Json Result&quot;, Author = &quot;dongsu&quot; });
+}</code></pre><p>URL{host:port}/art/jsontestへアクセス結果。</p><pre><code class="json">{
+  &quot;message&quot;: &quot;Json Result&quot;,
+  &quot;author&quot;: &quot;dongsu&quot;
+}</code></pre><h3 id="3-FileResultの実装例"><a href="#3-FileResultの実装例" class="headerlink" title="3. FileResultの実装例"></a>3. FileResultの実装例</h3><p>実装</p><pre><code class="cs">public IActionResult FileTest () {
+    var bytes = Encoding.Default.GetBytes (&quot;FileResult Test&quot;);
+    return File (bytes, &quot;application/text&quot;, &quot;filetest.txt&quot;);
+}</code></pre><p>URL{host:port}/art/filetestへアクセスするとファイルがダウンロードされ、中身はFileResult Testになります。</p><h3 id="3-Redirectの実装例"><a href="#3-Redirectの実装例" class="headerlink" title="3. Redirectの実装例"></a>3. Redirectの実装例</h3><pre><code class="cs">public IActionResult RedirectTest () {
+    return Redirect (&quot;https://dongsu.dev&quot;);
+}
+
+public IActionResult RedirectToActionTest () {
+    return RedirectToAction (&quot;jsontest&quot;);
+}
+
+public IActionResult RedirectToRouteTest () {
+    return RedirectToRoute (&quot;Default&quot;, new { Controller = &quot;home&quot;, Action = &quot;index&quot; });
+}</code></pre><p>結果は以下です。</p><ul><li>/art/redirecttestアクセスしたら、<a href="https://dongsu.dev">https://dongsu.dev</a> へアクセスされる</li><li>/art/redirecttoactiontestアクセスしたら、art/jsontestへアクセスされる</li><li>/art/redirecttoroutetestアクセスしたら、初期画面/へアクセスとなる</li></ul><h2 id="パラメータマッピングの実装例"><a href="#パラメータマッピングの実装例" class="headerlink" title="パラメータマッピングの実装例"></a>パラメータマッピングの実装例</h2><p>ルートがリクエスト処理を対応するコントローラーに渡した際に、コントローラーはそれに対応するアクションメソッドを見つけ出すと同時に、</p><p>HTTPリクエストデータ(QueryString、FormData、HTTP Header、HTTP Bodyなど)に対応するアクションメソッドの引数をマッチングさせます。</p><p>対応するリクエストデータと引数がマッチングしない場合、nullがパラメーター値として渡されます。</p><p>Controllersフォルダ内でParamsMappingTestcontrollerクラスを作成します。</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers {
+    public class ParamsMappingTestcontroller : Controller {
+    }
+}</code></pre><p>Startup.csにルーティング設定を追加します。</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;ParamsMappingTest&quot;,
+    template: &quot;pmt/{action}/{id?}&quot;,
+    defaults : new { controller = &quot;ParamsMappingTest&quot; }
+);</code></pre><h3 id="1-基本パラメータマッピングの実装例"><a href="#1-基本パラメータマッピングの実装例" class="headerlink" title="1. 基本パラメータマッピングの実装例"></a>1. 基本パラメータマッピングの実装例</h3><p>下記のアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult GetId (int id) {
+    return Content ($&quot;Action params mapping id : {id}&quot;);
+}</code></pre><p>アプリを起動し、URL{host:port}/pmt/getid/100へアクセスすると以下の結果になります。</p><pre><code class="txt">Action params mapping id : 100</code></pre><h3 id="2-配列パラメータマッピングの実装例"><a href="#2-配列パラメータマッピングの実装例" class="headerlink" title="2. 配列パラメータマッピングの実装例"></a>2. 配列パラメータマッピングの実装例</h3><p>実装</p><pre><code class="cs">public IActionResult GetArray (string[] id) {
+    var message = &quot;Action params mapping&quot;;
+    if (id != null) {
+        message += string.Join (&quot;,&quot;, id);
+    }
+
+    return Content (message);
+}</code></pre><p>URL{host:port}/pmt/getarray/1,2,3,4,5へアクセスすると以下の結果になります。</p><pre><code class="txt">Action params mapping 1,2,3,4,5</code></pre><h3 id="3-クラスパラメータマッチングの実装例"><a href="#3-クラスパラメータマッチングの実装例" class="headerlink" title="3. クラスパラメータマッチングの実装例"></a>3. クラスパラメータマッチングの実装例</h3><p>Modelsフォルダを作成し、その中にPersonクラスを実装します。</p><pre><code class="cs">using System;
+
+namespace ds.Tutorial.web.Models {
+    public class Person {
+        public string Name { get; set; }
+        public int Age { get; set; }
+
+    }
+}</code></pre><p>Controllerにアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult GetPerson (Person person) {
+    return Json (new { message = &quot;Action params mapping&quot;, data = person });
+}</code></pre><p>URL{host:port}/pmt/getperson?name=dongsu&amp;age=18へのアクセス結果。</p><pre><code class="json">{
+  &quot;message&quot;: &quot;Action params mapping&quot;,
+  &quot;data&quot;: {
+    &quot;name&quot;: &quot;dongsu&quot;,
+    &quot;age&quot;: 18
+  }
+}</code></pre><h3 id="4-クラスパラメータ（リスト型）マッチングの実装例"><a href="#4-クラスパラメータ（リスト型）マッチングの実装例" class="headerlink" title="4. クラスパラメータ（リスト型）マッチングの実装例"></a>4. クラスパラメータ（リスト型）マッチングの実装例</h3><p>Controllerにアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult GetPersonList (List&lt;Person&gt; persons) {
+    return Json (new { message = &quot;Action params mapping&quot;, data = persons });
+}</code></pre><p>URL{host:port}/pmt/getpersonlist?persons[0].name=dongsu&amp;persons[0].age=18&amp;persons[1].name=mihara&amp;persons[1].age=20へのアクセス結果。</p><pre><code class="json">{
+  &quot;message&quot;: &quot;Action params mapping&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;name&quot;: &quot;dongsu&quot;,
+      &quot;age&quot;: 18
+    },
+    {
+      &quot;name&quot;: &quot;mihara&quot;,
+      &quot;age&quot;: 20
+    }
+  ]
+}</code></pre><h3 id="5-JSONパラメータマッチングの実装例"><a href="#5-JSONパラメータマッチングの実装例" class="headerlink" title="5. JSONパラメータマッチングの実装例"></a>5. JSONパラメータマッチングの実装例</h3><p>Controllerにアクションメソッドを追加します。</p><pre><code class="cs">public IActionResult GetPersonJson ([FromBody] Person person) {
+    return Json (new { message = &quot;Action params mapping&quot;, data = person });
+}</code></pre><p>FormBobyなので、ここではHTTPリクエストを送信するツール(Postman, Advenced Rest Clientなど)を用いる必要があります。</p><img src="/images/dotnet-4/image1.jpg"><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/ds.Tutorial" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/10/asp_net_core_mvc/dotnet_portability_analysis/" class="link prev" title=".NET Portability Analyzerを使って.NETバージョン間の互換性をチェックする"><span class="hover-underline-animation">&larr; .NET Portability Analyzerを使って.NETバージョン間の互換性をチェックする</span> </a><a href="/2019/09/05/asp_net_core_mvc/basic/chap03/" class="link next" title="ASP.NET Core 入門3 ASP.NET Core MVC ルーティング"><span class="hover-underline-animation">ASP.NET Core 入門3 ASP.NET Core MVC ルーティング &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-前提知識"><span class="toc-text">3. 前提知識</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#コントローラの概要"><span class="toc-text">コントローラの概要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-コントローラーとは"><span class="toc-text">1. コントローラーとは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-コントローラーの定義"><span class="toc-text">2. コントローラーの定義</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-コントローラーの命名規則"><span class="toc-text">3. コントローラーの命名規則</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#コントローラーのアクションメソッド"><span class="toc-text">コントローラーのアクションメソッド</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-アクションメソッドとは"><span class="toc-text">1. アクションメソッドとは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-アクションメソッドの定義"><span class="toc-text">2. アクションメソッドの定義</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-アクションメソッドの戻り値"><span class="toc-text">3. アクションメソッドの戻り値</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#アクション結果の実装例"><span class="toc-text">アクション結果の実装例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ContentResultの実装例"><span class="toc-text">1. ContentResultの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-JsonResultの実装例"><span class="toc-text">2. JsonResultの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-FileResultの実装例"><span class="toc-text">3. FileResultの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-Redirectの実装例"><span class="toc-text">3. Redirectの実装例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#パラメータマッピングの実装例"><span class="toc-text">パラメータマッピングの実装例</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-基本パラメータマッピングの実装例"><span class="toc-text">1. 基本パラメータマッピングの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-配列パラメータマッピングの実装例"><span class="toc-text">2. 配列パラメータマッピングの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-クラスパラメータマッチングの実装例"><span class="toc-text">3. クラスパラメータマッチングの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-クラスパラメータ（リスト型）マッチングの実装例"><span class="toc-text">4. クラスパラメータ（リスト型）マッチングの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-JSONパラメータマッチングの実装例"><span class="toc-text">5. JSONパラメータマッチングの実装例</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

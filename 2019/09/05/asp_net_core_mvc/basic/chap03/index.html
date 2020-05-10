@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門3 ASP.NET Core MVC ルーティング - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門3 ASP.NET Core MVC ルーティング</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 6 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><a href="https://dongsu.dev/2019/09/04/asp_net_core_mvc/basic/chap02">前回</a>に引き続き<code>ASP.NET Core</code>を学習メモです。今回は<code>ASP.NET Core MVC</code> のルートについて学んでいきます。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li>ルートの原理</li><li>様々なルーティングの設定</li><li>規約ルーティングの設定</li><li>属性ルーティング</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.37.1</td></tr><tr><td>Browser</td><td>Google Chrome 76.0.3809.132</td></tr></tbody></table><h3 id="3-前提知識"><a href="#3-前提知識" class="headerlink" title="3. 前提知識"></a>3. 前提知識</h3><ul><li><p><a href="https://docs.microsoft.com/ja-jp/aspnet/core/mvc/overview?view=aspnetcore-2.2" target="_blank" rel="noopener">MVCフレームワーク</a></p></li><li><p><a href="https://docs.microsoft.com/ja-jp/dotnet/standard/base-types/regular-expression-language-quick-reference" target="_blank" rel="noopener">正規表現</a></p></li></ul><h2 id="ルーティングの概要"><a href="#ルーティングの概要" class="headerlink" title="ルーティングの概要"></a>ルーティングの概要</h2><h3 id="1-ルーティングサービスとは"><a href="#1-ルーティングサービスとは" class="headerlink" title="1. ルーティングサービスとは"></a>1. ルーティングサービスとは</h3><p><code>ASP.NET Core MVC</code> はルーティングミドルウェアを使って、受信したHTTPリクエストのマッチングを行い、対応したコントローラーにがリクエストを処理できるようにします。</p><p>複数のルーティング設定はできますが、マッチングの順番は<strong>先に</strong>定義したルーティングが優先されます。</p><h3 id="2-ルート設定のパラメータ"><a href="#2-ルート設定のパラメータ" class="headerlink" title="2. ルート設定のパラメータ"></a>2. ルート設定のパラメータ</h3><table><thead><tr><th>パラメータ</th><th>説明</th></tr></thead><tbody><tr><td>name</td><td>ルーティング名称、任意だが重複してはいけない</td></tr><tr><td>template</td><td>ルーティングテンプレート、URLのパターンや引数を定義する</td></tr><tr><td>dafault</td><td>ルーティングテンプレートの引数の初期値を設定する</td></tr><tr><td>constraints</td><td>ルート規約</td></tr></tbody></table><p>MVCフレームワークは既存では2つのパラメータ(controller, action)があり、ルーティングマッチングした場合に、リクエストが処理される。つまり、この2つのパラメータが1つでも存在しないと、ルートが正しく動作できません。</p><h2 id="ルーティング-ミドルウェアの設定"><a href="#ルーティング-ミドルウェアの設定" class="headerlink" title="ルーティング ミドルウェアの設定"></a>ルーティング ミドルウェアの設定</h2><h3 id="1-準備作業"><a href="#1-準備作業" class="headerlink" title="1. 準備作業"></a>1. 準備作業</h3><p>前回作成したプログラムに対して、少し追加をします。Controllersフォルダに新しくTutorialController.csクラスを作成して、下記のように実装します。</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers {
+    public class TutorialController : Controller {
+
+        public IActionResult Index () {
+            return Content (&quot;ASP.NET Core Tutorial&quot;);
+        }
+
+        public IActionResult Welcome (string name, int age) {
+            return Content ($&quot;Welcome {name} (age: {age})!&quot;);
+        }
+    }
+}</code></pre><h3 id="2-パラメータを使用したルーティング配置"><a href="#2-パラメータを使用したルーティング配置" class="headerlink" title="2. パラメータを使用したルーティング配置"></a>2. パラメータを使用したルーティング配置</h3><p>Startup.csにルーティング設定を追加します。</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialPathValueRoute&quot;,
+    template: &quot;{controller}/{action}/{name}/{age}&quot;
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>tutorial/welcome/dongsu/18</li></ul><p>このルーティング設定にマッチング<span style="color:red">しない</span>URL</p><ul><li>tutorial/welcome/dongsu</li></ul><p>もし、ageパラメータ無くてもURLをマッチングさせたい場合、ageを任意パラメータに変更することもできます。<br>{age}から{age?}に変更します。</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialPathValueRoute&quot;,
+    template: &quot;{controller}/{action}/{name}/{age?}&quot;
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>tutorial/welcome/dongsu/18</li><li>tutorial/welcome/dongsu</li><li>tutorial/welcome/dongsu?age=18</li></ul><h3 id="3-カスタムルート"><a href="#3-カスタムルート" class="headerlink" title="3. カスタムルート"></a>3. カスタムルート</h3><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialPrefixRoute&quot;,
+    template: &quot;dongchuan/{action}&quot;,
+    defaults : new { controller = &quot;Tutorial&quot; }
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>dongchuan/index</li><li>dongchuan/welcome</li></ul><p>templateにcontrollerの引数がないため、defaultsにcontrollerの初期値の指定が必要です。</p><h2 id="規則ルーティング"><a href="#規則ルーティング" class="headerlink" title="規則ルーティング"></a>規則ルーティング</h2><h3 id="1-ルート制約とは"><a href="#1-ルート制約とは" class="headerlink" title="1. ルート制約とは"></a>1. ルート制約とは</h3><p>ルートはルートパラメーターに関連付けされた検証ルールを用いて制約をかけることもできます。</p><p>制約かけるためにはStartup.csの名前空間に必要モジュールを追加します。</p><pre><code class="cs">using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Constraints;</code></pre><h3 id="2-文字列長さ制約"><a href="#2-文字列長さ制約" class="headerlink" title="2. 文字列長さ制約"></a>2. 文字列長さ制約</h3><p>nameの長さが6桁越えること禁止</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialLengthRoute&quot;,
+    template: &quot;hello/{name}/{age?}&quot;,
+    defaults : new { controller = &quot;Tutorial&quot;, action = &quot;Welcome&quot;, name = &quot;dongsu&quot; },
+    constraints : new { name = new MaxLengthRouteConstraint (6) }
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>hello</li><li>hello/dongsu</li><li>hello/dongsu/18</li></ul><p>このルーティング設定にマッチング<span style="color:red">しない</span>URL</p><ul><li>hello/dongsuaaa</li></ul><h3 id="3-数値範囲制約"><a href="#3-数値範囲制約" class="headerlink" title="3. 数値範囲制約"></a>3. 数値範囲制約</h3><p>年齢(age)が1~100以内</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialMinMaxRoute&quot;,
+    template: &quot;yeah/{name}/{age?}&quot;,
+    defaults : new { controller = &quot;Tutorial&quot;, action = &quot;Welcome&quot;, name = &quot;dongsu&quot; },
+    constraints : new {
+        age = new CompositeRouteConstraint (new IRouteConstraint[] {
+            new IntRouteConstraint (),
+                new MinRouteConstraint (1),
+                new MaxRouteConstraint (100)
+        })
+    }
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>yeah/dongsu/1</li><li>yeah/dongsu/100</li></ul><p>このルーティング設定にマッチング<span style="color:red">しない</span>URL</p><ul><li>yeah/dongsu/101</li><li>yeah/dongsu/1000</li></ul><h3 id="4-正規表現を使った制約"><a href="#4-正規表現を使った制約" class="headerlink" title="4. 正規表現を使った制約"></a>4. 正規表現を使った制約</h3><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialRegexRoute&quot;,
+    template: &quot;welcome/{name}&quot;,
+    defaults : new { controller = &quot;Tutorial&quot;, action = &quot;Welcome&quot; },
+    constraints : new { name = @&quot;d[a-z]*&quot; }
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>welcome/dongsu</li><li>welcome/dom</li><li>welcome/daisuke</li></ul><p>このルーティング設定にマッチング<span style="color:red">しない</span>URL</p><ul><li>welcome/d1</li><li>welcome/dM</li><li>welcome/miwa</li></ul><p>ここでnameに対して、正規表現を使って制約をかけました。</p><ul><li>d[a-z*] アルファベットdで始まり、後に続く文字もアルファベット</li></ul><h3 id="5-カスタム制約"><a href="#5-カスタム制約" class="headerlink" title="5. カスタム制約"></a>5. カスタム制約</h3><p>Commonフォルダを作成して、NameRouteConstraint.csのクラスを作成し、IRouteConstraintを実装します。</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+
+namespace ds.Tutorial.web.Common {
+    public class NameRouteConstraint : IRouteConstraint {
+        public bool Match (HttpContext httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection) {
+            string name = values[&quot;name&quot;]?.ToString ();
+            if (name == null) {
+                return true;
+            }
+            if (name.Contains (&quot;admin&quot;)) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+}</code></pre><p>nameパラメーターにadminというキーワードを含んではいけないようにしました。</p><p>Startup.csに名前空間を追加</p><pre><code class="cs">using ds.Tutorial.web.Common;</code></pre><p>ConfigureServicesにカスタム制約を注入。</p><pre><code class="cs">public void ConfigureServices (IServiceCollection services) {
+    // MVCモジュールの導入
+    services.AddMvc ();
+
+    // 定義したカスタムルート制約
+    services.Configure&lt;RouteOptions&gt; (options =&gt; {
+        options.ConstraintMap.Add (&quot;name&quot;, typeof (NameRouteConstraint));
+    });
+}</code></pre><p>ルーティング設定</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;TutorialOkConstraintRoute&quot;,
+    template: &quot;ok/{name}&quot;,
+    defaults : new { controller = &quot;Tutorial&quot;, action = &quot;Welcome&quot; },
+    constraints : new { name = new NameRouteConstraint () }
+);</code></pre><p>このルーティング設定にマッチングするURL</p><ul><li>ok/dongsu</li><li>ok/sibata</li><li>ok/tom</li></ul><p>このルーティング設定にマッチング<span style="color:red">しない</span>URL</p><ul><li>ok/admin</li><li>ok/rootadmin</li><li>ok/dongsuISadminROOT</li></ul><h2 id="属性ルーティング"><a href="#属性ルーティング" class="headerlink" title="属性ルーティング"></a>属性ルーティング</h2><p>属性ルーティングはコントローラーメソッドをURLにバインドする1つの方法です。<br>ルーティング設定ではなく、コントローラーメソッドに属性ルート<code>(RouteAttribute)</code>を使ってルートテンプレートを直接マップします。<br>内部ではそれらのルート属性により、システムのルートテーブルが生成されます。</p><p><strong>ただし、コントローラーはルーティング設定or属性ルーティング1つしか使用できません。もしRouteAttributeでルーティング配置したら、Startup.csで配置したルーティング設定は無効になります。</strong></p><p>Controllersフォルダで新しくTestController.csクラスを作成し、下記通りに実装します。</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers {
+    [Route (&quot;/test&quot;)]
+    public class TestController : Controller {
+
+        [Route (&quot;&quot;)]
+        [Route (&quot;/test/home&quot;)]
+        public IActionResult Index () =&gt;
+            Content (&quot;ASP.NET Core RouteAttribute test&quot;);
+
+        [Route (&quot;servertime&quot;)]
+        [Route (&quot;/t/t&quot;)]
+        public IActionResult Time () =&gt;
+            Content ($&quot;ServerTime: {DateTime.Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;)}&quot;);
+
+    }
+}</code></pre><table><thead><tr><th>ルート属性</th><th>説明</th></tr></thead><tbody><tr><td>[Route (“/test”)]</td><td>このコントローラーリクエストURLが必ず<code>/test</code>で始まる</td></tr><tr><td>[Route (“”)]</td><td>このアクションはリクエストURL<code>/test</code>に対して有効</td></tr><tr><td>[Route (“/test/home”)]</td><td>このアクションはリクエストURL<code>/test/home</code>に対して有効</td></tr><tr><td>[Route (“servertime”)]</td><td>このアクションはリクエストURL<code>/test/servertime</code>に対して有効</td></tr><tr><td>[Route (“/t/t”)]</td><td>このアクションはリクエストURL<code>/t/t</code>に対して有効、Controllerのルート属性は無視できる</td></tr></tbody></table><p>例えば[Route(“/test/home”)]なら、内部では以下のようなルーティング設定が生成されます。</p><pre><code class="cs">routes.MapRoute(
+    name: &quot;Default&quot;,
+    template: &quot;test/home&quot;,
+    defaults: new { controller = &quot;Test&quot;, action = &quot;Index&quot; }
+);</code></pre><p>ルーティングはStartup.csで定義しても、Controllerで定義しても構いませんが、<br>個人的には特殊な場合を除き、下記のようにStartup.csにて初期値のルート定義だけで統一したほうが良いと思います。</p><p>開発者の決定すべきことをなるべく減少させ、ビジネスロジックに集中させたほうが効率的に開発できます。</p><pre><code class="cs">routes.MapRoute (
+    name: &quot;Default&quot;,
+    template: &quot;{controller}/{action}&quot;,
+    defaults : new { controller = &quot;Home&quot;, action = &quot;Index&quot; }
+);</code></pre><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/ds.Tutorial" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/06/asp_net_core_mvc/basic/chap04/" class="link prev" title="ASP.NET Core 入門4 ASP.NET Core MVC コントローラー"><span class="hover-underline-animation">&larr; ASP.NET Core 入門4 ASP.NET Core MVC コントローラー</span> </a><a href="/2019/09/04/asp_net_core_mvc/basic/chap02/" class="link next" title="ASP.NET Core 入門2 ASP.NET Core MVCフレームワークを使ったプロジェクト構築"><span class="hover-underline-animation">ASP.NET Core 入門2 ASP.NET Core MVCフレームワークを使ったプロジェクト構築 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-前提知識"><span class="toc-text">3. 前提知識</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ルーティングの概要"><span class="toc-text">ルーティングの概要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ルーティングサービスとは"><span class="toc-text">1. ルーティングサービスとは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-ルート設定のパラメータ"><span class="toc-text">2. ルート設定のパラメータ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ルーティング-ミドルウェアの設定"><span class="toc-text">ルーティング ミドルウェアの設定</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-準備作業"><span class="toc-text">1. 準備作業</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-パラメータを使用したルーティング配置"><span class="toc-text">2. パラメータを使用したルーティング配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-カスタムルート"><span class="toc-text">3. カスタムルート</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#規則ルーティング"><span class="toc-text">規則ルーティング</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-ルート制約とは"><span class="toc-text">1. ルート制約とは</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-文字列長さ制約"><span class="toc-text">2. 文字列長さ制約</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-数値範囲制約"><span class="toc-text">3. 数値範囲制約</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-正規表現を使った制約"><span class="toc-text">4. 正規表現を使った制約</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-カスタム制約"><span class="toc-text">5. カスタム制約</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#属性ルーティング"><span class="toc-text">属性ルーティング</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

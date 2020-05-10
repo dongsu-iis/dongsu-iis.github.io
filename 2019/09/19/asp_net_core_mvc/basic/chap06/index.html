@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門6 ASP.NET Core MVC ビューレイアウト</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 4 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><a href="https://dongsu.dev/2019/09/11/asp_net_core_mvc/basic/chap05">前回</a>に引き続き<code>ASP.NET Core</code>を学習メモです。今回は<code>ASP.NET Core MVC</code> のRazorのレイアウト配置について学んでいきます。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li>Razorのマスターページのレイアウト</li><li>Razorのカスタムセクション</li><li>Razorのグローバルファイル</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.37.1</td></tr><tr><td>Browser</td><td>Google Chrome 76.0.3809.132</td></tr></tbody></table><h2 id="マスターページテンプレートレイアウト"><a href="#マスターページテンプレートレイアウト" class="headerlink" title="マスターページテンプレートレイアウト"></a>マスターページテンプレートレイアウト</h2><p>Webページは通常共通のレイアウト構成があります。例えばヘッダー、フッター、ナビゲーションバーなどです。<br>こうすることでページごとのレイアウトを気にするなく、作成するページだけのコンテンツに集中することができます。開発効率を高めるだけでなく、共通レイアウトのメンテナンスもし易いです。</p><p>RazorのビューエンジンもLayoutの概念があり、子ページからマスターページのレイアウトを適用することができます。</p><h3 id="1-Layoutのマスターページを作成"><a href="#1-Layoutのマスターページを作成" class="headerlink" title="1. Layoutのマスターページを作成"></a>1. Layoutのマスターページを作成</h3><p><font color="HotPink"><code>Views</code></font>フォルダ配下に<font color="HotPink"><code>Shared</code></font>フォルダを作成し、<font color="HotPink"><code>Shared</code></font>のなかにマスターページ<font color="HotPink"><code>_Layout.cshtml</code></font>を作成します。</p><pre><code class="html">&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;@ViewBag.Title - ds.Tutorial&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;header&quot;&gt;
+            &lt;h1 style=&quot;color: blue&quot;&gt;ds.Tutorial&lt;/h1&gt;
+            &lt;hr/&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;content&quot;&gt;
+            @RenderBody()
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre><p>@ViewBag.Titleで現在ページのタイトルを表示します。</p><p>@RenderBodyでマスターページのレイアウトを適用し、他のビューのレンダリングします。</p><h3 id="2-ビューの子-サブ-ページを作成"><a href="#2-ビューの子-サブ-ページを作成" class="headerlink" title="2. ビューの子(サブ)ページを作成"></a>2. ビューの子(サブ)ページを作成</h3><p><font color="HotPink"><code>/Views/Home</code></font>の配下で<font color="HotPink"><code>Index.cshtml</code></font>を作成し、レイアウトを適用します。</p><pre><code class="html">@{
+    Layout = &quot;_Layout&quot;;
+}
+
+&lt;h3&gt;@ViewBag.Title&lt;/h3&gt;
+@ViewBag.Message</code></pre><p><font color="HotPink"><code>HomeController.cs</code></font>のIndexのAction Methodを修正します。</p><pre><code class="cs">public IActionResult Index () {
+    ViewBag.Title = &quot;Home&quot;;
+    ViewBag.Message = &quot;Hello world ! - dongsu&quot;;
+    return View();
+}</code></pre><h3 id="3-稼働確認"><a href="#3-稼働確認" class="headerlink" title="3. 稼働確認"></a>3. 稼働確認</h3><p><font color="HotPink"><code>/home/index</code></font>へアクセスすると下記の画面が表示されます。</p><p><img src="/images/dotnet-6/2019-09-19-14-13-30.png" alt></p><h2 id="カスタムセクション"><a href="#カスタムセクション" class="headerlink" title="カスタムセクション"></a>カスタムセクション</h2><p>マスターページを使用することでレイアウトのコンテンツや機能を簡単に共有できます。<br>しかし、サブページでマスターページのコンテンツの表示しつつ、一部のコンテンツだけ書き換えたい要望が当然あります。</p><p>その場合、カスタムセクションのレンダリングする必要があります。</p><p>Razorは<font color="HotPink"><code>Section</code></font>の機能を提供しており、マスターページから<font color="HotPink"><code>RanderSection</code></font>メソッドを用いて、自分で定義した<font color="HotPink"><code>Section</code></font>を表示させることができます。</p><h3 id="1-Sectionの定義"><a href="#1-Sectionの定義" class="headerlink" title="1. Sectionの定義"></a>1. Sectionの定義</h3><p>Sectionはサブページのみで定義することが有効です。</p><pre><code class="html">@section sample{
+    &lt;p&gt;Section Content&lt;/p&gt;
+}</code></pre><ul><li>@section : Sectionを宣言するためのキーワード</li><li>sampel : Section名、自分で定義できます。C#の変数名と同じルールで定義可能</li></ul><p>マスターページは<code>@RenderSection()</code> で定義したSectionをレンダリングできます。</p><ul><li><p>強制的にレンダリング</p><pre><code class="cs">  @RenderSection(&quot;sample&quot;)</code></pre></li><li><p>サブページに定義があればレンダリング</p><pre><code class="cs">  @RenderSection(&quot;sample&quot;,false)</code></pre></li><li><p>サブページに定義があればレンダリング、なければデフォルトコンテンツを表示</p><pre><code class="cs">  @if(IsSectionDefined(&quot;sample&quot;))
+  {
+      RenderSection(&quot;sample&quot;);
+  }
+  else
+  {
+      &lt;p&gt;Layout Content&lt;/p&gt;
+  }</code></pre></li></ul><h3 id="2-Sectionの実装例"><a href="#2-Sectionの実装例" class="headerlink" title="2. Sectionの実装例"></a>2. Sectionの実装例</h3><p><font color="HotPink"><code>Controllers</code></font>フォルダ配下に<font color="HotPink">Layout<code>Controller.cs</code></font>を作成します。</p><pre><code class="cs">using System;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers
+{
+    public class LayoutController : Controller
+    {
+        public IActionResult SectionDemo()
+        {
+            return View();
+        } 
+    }
+}</code></pre><p><font color="HotPink"><code>Views</code></font>フォルダ配下に<font color="HotPink">Layout</font>フォルダを作成します。<br>その中で<font color="HotPink">SectionDemo.cshtml</font>を作成します。</p><pre><code class="html">@{
+    Layout = &quot;_Layout&quot;;
+    ViewBag.Title = &quot;SectionDemo&quot;;
+}
+
+&lt;h3&gt;@ViewBag.Title&lt;/h3&gt;
+&lt;p&gt;Section Demo By dongsu.dev&lt;/p&gt;
+
+@section footer{
+    &lt;p&gt;Section Footer&lt;/p&gt;
+}</code></pre><p><font color="HotPink"><code>_Layout.cshtml</code></font>を修正し、Sectionレンダリングを追加</p><pre><code class="html">&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;@ViewBag.Title - ds.Tutorial&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div class=&quot;header&quot;&gt;
+            &lt;h1 style=&quot;color: blue&quot;&gt;ds.Tutorial&lt;/h1&gt;
+            &lt;hr/&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;content&quot;&gt;
+            @RenderBody()
+        &lt;/div&gt;
+
+        &lt;div class=&quot;footer&quot;&gt;
+            &lt;hr/&gt;
+
+            @if(IsSectionDefined(&quot;footer&quot;)){
+                RenderSection(&quot;footer&quot;);
+            }else{
+                &lt;p&gt;Layout Footer&lt;/p&gt;
+            }
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre><h3 id="3-稼働確認-1"><a href="#3-稼働確認-1" class="headerlink" title="3. 稼働確認"></a>3. 稼働確認</h3><p><font color="HotPink"><code>/</code></font>へアクセスすると下記の画面が表示されます。</p><p><img src="/images/dotnet-6/2019-09-19-14-55-09.png" alt></p><p><font color="HotPink">layout/sectiondemo</font>へアクセスすると下記の画面が表示されます。</p><p><img src="/images/dotnet-6/2019-09-19-14-55-48.png" alt></p><h2 id="グローバルファイル"><a href="#グローバルファイル" class="headerlink" title="グローバルファイル"></a>グローバルファイル</h2><p>Razorはビューレンダリングする前に実行されるコードのファイルを提供しており、<br>それが<font color="HotPink"><code>_ViewStart.cshtml</code></font>です。通常、このファイルを使うことで規定のレイアウトを指示するために使われることが多いです。そして、このファイルはViewsフォルダの配下に配置しなければいけません。</p><p><font color="HotPink"><code>Views</code></font>フォルダ直下に<font color="HotPink"><code>_ViewStart.cshtml</code></font>を作成します。</p><pre><code class="cs">@{
+    Layout = &quot;_Layout&quot;;
+}</code></pre><p>これで、すべてのページがレイアウトが適用されますので、<font color="HotPink"><code>Index.cshtml</code></font>のLayout定義を削除してOKです。</p><pre><code class="html">@{
+    //Layout = &quot;_Layout&quot;;
+}
+
+&lt;h3&gt;@ViewBag.Title&lt;/h3&gt;
+@ViewBag.Message</code></pre><p><font color="HotPink"><code>/</code></font>へアクセスしても同じようにレイアウト適用済みの画面が表示されます。</p><p><img src="/images/dotnet-6/2019-09-19-14-55-09.png" alt></p><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/ds.Tutorial" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/19/other/hexo/" class="link prev" title="Hexoを使って自分独自の技術ブログを構築する"><span class="hover-underline-animation">&larr; Hexoを使って自分独自の技術ブログを構築する</span> </a><a href="/2019/09/17/asp_net_core_mvc/dotnet_bundle/" class="link next" title="ASP.NET Core MVCでnpmを用いて静的コンテンツを管理"><span class="hover-underline-animation">ASP.NET Core MVCでnpmを用いて静的コンテンツを管理 &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#マスターページテンプレートレイアウト"><span class="toc-text">マスターページテンプレートレイアウト</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Layoutのマスターページを作成"><span class="toc-text">1. Layoutのマスターページを作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-ビューの子-サブ-ページを作成"><span class="toc-text">2. ビューの子(サブ)ページを作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-稼働確認"><span class="toc-text">3. 稼働確認</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#カスタムセクション"><span class="toc-text">カスタムセクション</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Sectionの定義"><span class="toc-text">1. Sectionの定義</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Sectionの実装例"><span class="toc-text">2. Sectionの実装例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-稼働確認-1"><span class="toc-text">3. 稼働確認</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#グローバルファイル"><span class="toc-text">グローバルファイル</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

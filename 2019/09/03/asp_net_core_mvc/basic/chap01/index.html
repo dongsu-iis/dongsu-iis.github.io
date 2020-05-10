@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門1 ASP.NET Coreを使って初めてのWebアプリを構築 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門1 ASP.NET Coreを使って初めてのWebアプリを構築</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 3 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><code>ASP.NET Core</code>を学習することにあたって、思考の整理と学習記録をここの記載します。</p><p>私自身も<code>.NET Core</code>を触るのが初めてなので、間違っている部分があれば、コメントにて指摘をお願いします。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li>Visual Studio Codeを使った環境構築</li><li><code>ASP.NET Core</code>を用いてWebアプリを作成</li><li><code>ASP.NET Core</code> Webのアプリケーション起動クラスの説明</li><li><code>ASP.NET Core</code> Webのプロジェクト構造の説明</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.37.1</td></tr><tr><td>Browser</td><td>Google Chrome 76.0.3809.132</td></tr></tbody></table><h3 id="3-前提知識"><a href="#3-前提知識" class="headerlink" title="3. 前提知識"></a>3. 前提知識</h3><ul><li>Visual Studio Codeの操作方法</li><li><a href="https://docs.microsoft.com/ja-jp/dotnet/csharp/tutorials/" target="_blank" rel="noopener">C#の基礎</a></li></ul><h2 id="環境構築"><a href="#環境構築" class="headerlink" title="環境構築"></a>環境構築</h2><h3 id="1-SDKのダウンロード-amp-インストール"><a href="#1-SDKのダウンロード-amp-インストール" class="headerlink" title="1. SDKのダウンロード&amp;インストール"></a>1. SDKのダウンロード&amp;インストール</h3><ul><li><p>ダウンロード先</p><p><a href="https://dotnet.microsoft.com/download/dotnet-core" target="_blank" rel="noopener">SDK</a></p><p>.NET Core 2.1以降を選ぶこと</p></li><li><p>インストール</p><p>特段説明する必要もないです。次へ次へと進めばOK。</p></li></ul><h3 id="2-Visual-Studio-Codeダウンロード-amp-インストール"><a href="#2-Visual-Studio-Codeダウンロード-amp-インストール" class="headerlink" title="2. Visual Studio Codeダウンロード&amp;インストール"></a>2. Visual Studio Codeダウンロード&amp;インストール</h3><ul><li><p>ダウンロード先</p><p><a href="https://code.visualstudio.com/download" target="_blank" rel="noopener">VSCode</a></p></li><li><p>インストール</p><p>特段説明する必要もないです。次へ次へと進めばOK。</p></li></ul><h3 id="3-VSCode拡張機能"><a href="#3-VSCode拡張機能" class="headerlink" title="3. VSCode拡張機能"></a>3. VSCode拡張機能</h3><table><thead><tr><th>拡張機能</th><th>説明</th></tr></thead><tbody><tr><td><a href="https://marketplace.visualstudio.com/items?itemName=doggy8088.netcore-extension-pack" target="_blank" rel="noopener">.NET Core Extension Pack</a></td><td>.NET Coreで開発ツール全揃</td></tr><tr><td><a href="https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-ja" target="_blank" rel="noopener">Japanese Language Pack for VS Code</a></td><td>UIの日本語化</td></tr></tbody></table><h2 id="VSCodeを使ってWebプロジェクトを作成"><a href="#VSCodeを使ってWebプロジェクトを作成" class="headerlink" title="VSCodeを使ってWebプロジェクトを作成"></a>VSCodeを使ってWebプロジェクトを作成</h2><h3 id="1-プロジェクト作成"><a href="#1-プロジェクト作成" class="headerlink" title="1. プロジェクト作成"></a>1. プロジェクト作成</h3><p>コマンドを用いてプロジェクトを作成します</p><pre><code class="bash"># プロジェクトフォルダ作成
+mkdir projects
+
+# フォルダ変更
+cd projects
+
+# dotnet cliでプロジェクト生成
+dotnet new web -n helloweb</code></pre><h3 id="2-VSCodeでプロジェクトを開く"><a href="#2-VSCodeでプロジェクトを開く" class="headerlink" title="2. VSCodeでプロジェクトを開く"></a>2. VSCodeでプロジェクトを開く</h3><p>hellowebのフォルダを右クリックし、<strong>Open with Code</strong>を選択し、プロジェクトを開きます。</p><p>下記のような警告が表示されますが、Yesを選択します。</p><img src="/images/dotnet-1/image1.jpg"><p>.vscodeのフォルダに二つのファイルが出来上がります。(launch.json, tasks.json)</p><p>これで環境構築とプロジェクト作成が完了です。</p><h3 id="3-VSCodeからプロジェクトを起動"><a href="#3-VSCodeからプロジェクトを起動" class="headerlink" title="3. VSCodeからプロジェクトを起動"></a>3. VSCodeからプロジェクトを起動</h3><p>そのままVSCodeで恒例の<strong>F5</strong>を押してデバッグしてみます。<br>初期URLは<br><code>https://localhost:5001</code><br>です。</p><p>Chromeの場合SSL証明書なしの警告が発生しますが、そのまま継続して進んでください。<br>そうするとhelloworldのページが表示されます。</p><h3 id="4-プロトコルをHTTPS⇒HTTPへ変更する"><a href="#4-プロトコルをHTTPS⇒HTTPへ変更する" class="headerlink" title="4. プロトコルをHTTPS⇒HTTPへ変更する"></a>4. プロトコルをHTTPS⇒HTTPへ変更する</h3><p>毎回Chromeからの警告が煩わしいので、HTTPプロトコルに変更します。</p><p>Properties/launchSettings.jsonのファイルを開き下記のように変更します。</p><p>変更前</p><pre><code class="json">{
+  &quot;iisSettings&quot;: {
+    &quot;windowsAuthentication&quot;: false, 
+    &quot;anonymousAuthentication&quot;: true, 
+    &quot;iisExpress&quot;: {
+      &quot;applicationUrl&quot;: &quot;http://localhost:28391&quot;,
+      &quot;sslPort&quot;: 44308
+    }
+  },
+  &quot;profiles&quot;: {
+    &quot;IIS Express&quot;: {
+      &quot;commandName&quot;: &quot;IISExpress&quot;,
+      &quot;launchBrowser&quot;: true,
+      &quot;environmentVariables&quot;: {
+        &quot;ASPNETCORE_ENVIRONMENT&quot;: &quot;Development&quot;
+      }
+    },
+    &quot;helloweb&quot;: {
+      &quot;commandName&quot;: &quot;Project&quot;,
+      &quot;launchBrowser&quot;: true,
+      &quot;applicationUrl&quot;: &quot;https://localhost:5001;http://localhost:5000&quot;,
+      &quot;environmentVariables&quot;: {
+        &quot;ASPNETCORE_ENVIRONMENT&quot;: &quot;Development&quot;
+      }
+    }
+  }
+}</code></pre><p>変更後</p><pre><code class="json">{
+  &quot;iisSettings&quot;: {
+    &quot;windowsAuthentication&quot;: false, 
+    &quot;anonymousAuthentication&quot;: true, 
+    &quot;iisExpress&quot;: {
+      &quot;applicationUrl&quot;: &quot;http://localhost:28391&quot;,
+      &quot;sslPort&quot;: 44308
+    }
+  },
+  &quot;profiles&quot;: {
+    &quot;IIS Express&quot;: {
+      &quot;commandName&quot;: &quot;IISExpress&quot;,
+      &quot;launchBrowser&quot;: true,
+      &quot;environmentVariables&quot;: {
+        &quot;ASPNETCORE_ENVIRONMENT&quot;: &quot;Development&quot;
+      }
+    },
+    &quot;helloweb&quot;: {
+      &quot;commandName&quot;: &quot;Project&quot;,
+      &quot;launchBrowser&quot;: true,
+      &quot;applicationUrl&quot;: &quot;http://localhost:5001&quot;,
+      &quot;environmentVariables&quot;: {
+        &quot;ASPNETCORE_ENVIRONMENT&quot;: &quot;Development&quot;
+      }
+    }
+  }
+}</code></pre><h3 id="4-プロジェクト起動の流れ"><a href="#4-プロジェクト起動の流れ" class="headerlink" title="4. プロジェクト起動の流れ"></a>4. プロジェクト起動の流れ</h3><ul><li>アプリケーションエントリクラス</li></ul><pre><code class="cs">public class Program
+{
+    public static void Main(string[] args)
+    {
+        CreateWebHostBuilder(args).Build().Run();
+    }
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =&gt;
+        WebHost.CreateDefaultBuilder(args)
+            .UseStartup&lt;Startup&gt;();
+}</code></pre><p>アプリケーション起動する際に<strong>CreateWebHostBuilder</strong>によって、ASP.NET Coreホストのインスタンスが生成されます。</p><ul><li>アプリケーション起動クラス</li></ul><pre><code class="cs">public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+    }
+
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        app.Run(async (context) =&gt;
+        {
+            await context.Response.WriteAsync(&quot;Hello World!&quot;);
+        });
+    }
+}</code></pre><table><thead><tr><th>メソッド</th><th>説明</th></tr></thead><tbody><tr><td>ConfigureServices</td><td>起動時にアプリケーションが依存するサービスを注入(追加)します</td></tr><tr><td>Configure</td><td>HTTPリクエストパイプラインを構成します</td></tr></tbody></table><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/helloweb" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/09/04/asp_net_core_mvc/basic/chap02/" class="link prev" title="ASP.NET Core 入門2 ASP.NET Core MVCフレームワークを使ったプロジェクト構築"><span class="hover-underline-animation">&larr; ASP.NET Core 入門2 ASP.NET Core MVCフレームワークを使ったプロジェクト構築</span> </a><a href="/2019/08/27/other/blog_move/" class="link next" title="Blogを移管しました"><span class="hover-underline-animation">Blogを移管しました &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-前提知識"><span class="toc-text">3. 前提知識</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#環境構築"><span class="toc-text">環境構築</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-SDKのダウンロード-amp-インストール"><span class="toc-text">1. SDKのダウンロード&amp;インストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Visual-Studio-Codeダウンロード-amp-インストール"><span class="toc-text">2. Visual Studio Codeダウンロード&amp;インストール</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-VSCode拡張機能"><span class="toc-text">3. VSCode拡張機能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#VSCodeを使ってWebプロジェクトを作成"><span class="toc-text">VSCodeを使ってWebプロジェクトを作成</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-プロジェクト作成"><span class="toc-text">1. プロジェクト作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-VSCodeでプロジェクトを開く"><span class="toc-text">2. VSCodeでプロジェクトを開く</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-VSCodeからプロジェクトを起動"><span class="toc-text">3. VSCodeからプロジェクトを起動</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-プロトコルをHTTPS⇒HTTPへ変更する"><span class="toc-text">4. プロトコルをHTTPS⇒HTTPへ変更する</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-プロジェクト起動の流れ"><span class="toc-text">4. プロジェクト起動の流れ</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html><html lang="ja"><head><meta name="generator" content="Hexo 3.9.0"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="X-UA-Compatible" content="chrome=1"><meta name="renderer" content="webkit|ie-comp|ie-stand"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#333333"><meta name="mobile-web-app-capable" content="yes"><meta name="google" content="notranslate"><meta name="format-detection" content="telephone=no"><meta name="keyword" content="Web, Js, CSS, .NET Core, C#, ASP.NET Core MVC, Docker"><meta name="description" content="書きたいことを書くだけ"><title>ASP.NET Core 入門8 ASP.NET Core + Entity Framework CoreでDB接続 - dongsuの技術Blog</title><base href="/"><link rel="preconnect" href="//cdnjs.cloudflare.com"><link rel="manifest" href="/manifest.json"><link rel="shortcut icon" href="/icons/icon-72x72.png"><link rel="apple-touch-icon" href="/icons/icon-192x192.png"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-light.min.css"><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/styles/atom-one-dark.min.css" media="screen and (prefers-color-scheme:dark)"><script async src="https://www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","UA-148723572-1")</script><script data-ad-client="ca-pub-6171463180373492" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script><link rel="stylesheet" href="/styles/sanitize.css"><link rel="stylesheet" href="/styles/cold-stone.css"><noscript><p class="text-center">你的浏览器还没开启 Javascript 功能！</p></noscript><link rel="alternate" href="/atom.xml" title="dongsuの技術Blog" type="application/atom+xml"></head><body><main class="main wrapper"><article class="article slide-in-right"><section><h1 class="article-title">ASP.NET Core 入門8 ASP.NET Core + Entity Framework CoreでDB接続</h1><p class="article-meta"><span class="meta-info"><span>更新日時&#58;<time class="post-time" datetime="2020-05-10">2020-05-10</time> </span><span>閲覧時間&#58; 11 min</span> <span class="hide" id="busuanzi_container_page_pv">閲覧回数&#58; <span id="busuanzi_value_page_pv"></span></span> </span><a class="meta-link hover-underline-animation" id="back">前へ</a></p></section><section class="article-content"><p><a href="https://dongsu.dev/2019/09/27/asp_net_core_mvc/basic/chap07">前回</a>までに<code>ASP.NET Core MVC</code> を用いて、リクエスト処理や画面描画について学びました。今回はEntity Framework Coreを用いて、データ永続化するためにDB操作について学んでいきます。</p><h2 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h2><h3 id="1-このコンテンツを扱うこと"><a href="#1-このコンテンツを扱うこと" class="headerlink" title="1. このコンテンツを扱うこと"></a>1. このコンテンツを扱うこと</h3><ul><li><code>ASP.NET Core MVC</code> におけるEF Coreの概要説明</li><li><code>ASP.NET Core MVC</code> でEF Core + Linq to EntityからSQL Serverを操作する</li><li><code>ASP.NET Core MVC</code> でEF Core + 生SQLからSQL Serverを操作する</li></ul><h3 id="2-環境情報"><a href="#2-環境情報" class="headerlink" title="2. 環境情報"></a>2. 環境情報</h3><table><thead><tr><th>環境/ソフトウェア</th><th>内容</th></tr></thead><tbody><tr><td>オペレーティングシステム</td><td>Windows 10 1903</td></tr><tr><td>.NET Core SDK</td><td>2.1.801</td></tr><tr><td>IDE</td><td>Visual Studio Code 1.38.1</td></tr><tr><td>Browser</td><td>Google Chrome 76.0.3809.132</td></tr><tr><td>DB</td><td>SQL Server LocalDB</td></tr></tbody></table><h3 id="3-事前準備"><a href="#3-事前準備" class="headerlink" title="3. 事前準備"></a>3. 事前準備</h3><p>下記サイトにてSQL Serverの<strong>Express</strong>をからインストーラーをダウンロードしてください。<br>インストール時はLocalDBを選択してください。</p><p><a href="https://www.microsoft.com/ja-jp/sql-server/sql-server-downloads" target="_blank" rel="noopener">SQL Server</a></p><p>SQL Serverを操作するため、下記URLよりSQL Server Management Studioを取得して、インストールすることをお勧めします。</p><p><a href="https://docs.microsoft.com/ja-jp/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-2017" target="_blank" rel="noopener">SQL Server Management Studio</a></p><h3 id="4-前提知識"><a href="#4-前提知識" class="headerlink" title="4. 前提知識"></a>4. 前提知識</h3><ul><li><a href="https://docs.microsoft.com/ja-jp/dotnet/csharp/tutorials/working-with-linq" target="_blank" rel="noopener"><strong>Linqの公式リファレンス</strong></a></li></ul><h2 id="EF-Core-SQL-Serverの導入＆接続準備"><a href="#EF-Core-SQL-Serverの導入＆接続準備" class="headerlink" title="EF Core + SQL Serverの導入＆接続準備"></a>EF Core + SQL Serverの導入＆接続準備</h2><p>EF Core(正式名:Entity Framework Core)はMicrosoftが<code>.NET Core</code> フレームワークのためのORMフレームワークです。もちろん、他のORMフレームワーク（Hibernate）という選択肢がありますが、EF Coreのほうが<code>.NET</code> と親和性が高く、効率と生産性に優れています。</p><h3 id="1-EF-Core-SQLserver-Provide導入"><a href="#1-EF-Core-SQLserver-Provide導入" class="headerlink" title="1. EF Core + SQLserver Provide導入"></a>1. EF Core + SQLserver Provide導入</h3><p>SQL Serverへ接続するためのprovideを導入します。</p><pre><code class="bash">cd ds.Tutorial.web
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 2.1.11</code></pre><h3 id="2-DBとテーブル作成"><a href="#2-DBとテーブル作成" class="headerlink" title="2. DBとテーブル作成"></a>2. DBとテーブル作成</h3><p>SQL Management Studioを用いてDBとテーブルを作成します。</p><h4 id="データベース作成"><a href="#データベース作成" class="headerlink" title="データベース作成"></a>データベース作成</h4><pre><code class="sql">CREATE DATABASE dongsu_tutorial;</code></pre><h4 id="テーブル作成"><a href="#テーブル作成" class="headerlink" title="テーブル作成"></a>テーブル作成</h4><pre><code class="sql">USE dongsu_tutorial;
+GO
+
+CREATE TABLE [dbo].[user]
+([id]    [INT] IDENTITY(1, 1) NOT NULL, 
+ [name]  [NVARCHAR](255) NULL, 
+ [age]   [INT] NULL, 
+ [hobby] [NVARCHAR](500) NULL, 
+ CONSTRAINT [PK_user] PRIMARY KEY CLUSTERED([id] ASC)
+ WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+)
+ON [PRIMARY];
+GO</code></pre><h3 id="3-接続文字列を作成"><a href="#3-接続文字列を作成" class="headerlink" title="3. 接続文字列を作成"></a>3. 接続文字列を作成</h3><p>ds.Tutorial.web配下にappsettings.jsonファイルを作成して、以下を記述します。</p><pre><code class="json">{
+    &quot;ConnectionStrings&quot;: {
+        &quot;tutorial_db&quot;: &quot;Server=(localdb)\\mssqllocaldb;Database=dongsu_tutorial;Trusted_Connection=True;&quot;
+    }
+}</code></pre><h3 id="4-EntityとDbContextを作成"><a href="#4-EntityとDbContextを作成" class="headerlink" title="4. EntityとDbContextを作成"></a>4. EntityとDbContextを作成</h3><h4 id="Entity作成"><a href="#Entity作成" class="headerlink" title="Entity作成"></a>Entity作成</h4><p>Models配下にUserEntity.csを作成します。</p><pre><code class="cs">using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ds.Tutorial.web.Models {
+    [Table (&quot;user&quot;)]
+    [Serializable]
+    public class UserEntity {
+        [Key]
+        [DatabaseGenerated (DatabaseGeneratedOption.Identity)]
+        [Column (&quot;id&quot;)]
+        public int Id { get; set; }
+
+        [Column (&quot;name&quot;)]
+        public string Name { get; set; }
+
+        [Column (&quot;age&quot;)]
+        public int Age { get; set; }
+
+        [Column (&quot;hobby&quot;)]
+        public string Hobby { get; set; }
+    }
+}</code></pre><h4 id="DbContext作成"><a href="#DbContext作成" class="headerlink" title="DbContext作成"></a>DbContext作成</h4><p>ds.Tutorial.web配下Repositoriesのフォルダを作成し、その中にTutorialDbContext.csを作成します。</p><pre><code class="cs">using ds.Tutorial.web.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ds.Tutorial.web.Repositories {
+    public class TutorialDbContext : DbContext {
+
+        public TutorialDbContext () { }
+
+        public TutorialDbContext (DbContextOptions&lt;TutorialDbContext&gt; options) : base (options) { }
+
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) { }
+
+        public DbSet&lt;UserEntity&gt; Users { get; set; }
+
+    }
+}</code></pre><h4 id="Startup-csを修正"><a href="#Startup-csを修正" class="headerlink" title="Startup.csを修正"></a>Startup.csを修正</h4><p>Startup.csでDB接続文字列からDI注入を用いてDbContextを生成できるように修正します。</p><pre><code class="cs">using ds.Tutorial.web.Common;
+using ds.Tutorial.web.Repositories;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace ds.Tutorial.web {
+    public class Startup {
+
+        public Startup (IConfiguration configuration) {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public void ConfigureServices (IServiceCollection services) {
+            services.AddMvc ();
+
+            services.AddDbContext&lt;TutorialDbContext&gt; (options =&gt;
+                options.UseSqlServer (Configuration.GetConnectionString (&quot;tutorial_db&quot;))
+            );
+
+            // 以下省略</code></pre><h2 id="EF-Core-Linq-to-Entityの操作方法"><a href="#EF-Core-Linq-to-Entityの操作方法" class="headerlink" title="EF Core + Linq to Entityの操作方法"></a>EF Core + Linq to Entityの操作方法</h2><h3 id="1-リポジトリ作成"><a href="#1-リポジトリ作成" class="headerlink" title="1. リポジトリ作成"></a>1. リポジトリ作成</h3><p>ds.Tutorial.web配下RepositoriesのフォルダにDB接続クラスを作成します。</p><pre><code class="cs">using System;
+using System.Collections.Generic;
+using System.Linq;
+using ds.Tutorial.web.Models;
+
+namespace ds.Tutorial.web.Repositories {
+    public class TutorialRepository {
+        private TutorialDbContext _dbContext;
+
+        public TutorialRepository (TutorialDbContext dbContext) {
+            _dbContext = dbContext;
+        }
+
+        public int Create (UserEntity user) {
+            using (_dbContext) {
+                _dbContext.Users.Add (user);
+                return _dbContext.SaveChanges ();
+            }
+        }
+
+        public int Update (UserEntity user) {
+            using (_dbContext) {
+                var userForm = _dbContext.Users.FirstOrDefault (x =&gt; x.Id == user.Id);
+                userForm.Name = user.Name;
+                userForm.Age = user.Age;
+                userForm.Hobby = user.Hobby;
+                return _dbContext.SaveChanges ();
+            }
+        }
+
+        public int Delete (int id) {
+            using (_dbContext) {
+                var userForm = _dbContext.Users.FirstOrDefault (x =&gt; x.Id == id);
+                _dbContext.Users.Remove (userForm);
+                return _dbContext.SaveChanges ();
+            }
+        }
+
+        public UserEntity GetOneById (int id) {
+            using (_dbContext) {
+                return _dbContext.Users.FirstOrDefault (x =&gt; x.Id == id);
+            }
+        }
+
+        public List&lt;UserEntity&gt; GetAllByAge (int age) {
+            using (_dbContext) {
+                return _dbContext.Users.Where (x =&gt; x.Age == age).ToList ();
+            }
+        }
+
+        public List&lt;string&gt; GetNamesByAge (int age) {
+            using (_dbContext) {
+                return _dbContext.Users.Where (x =&gt; x.Age == age).Select (x =&gt; x.Name).ToList ();
+            }
+        }
+
+        public List&lt;UserEntity&gt; GetAllPaging (int pageSize, int page) {
+            using (_dbContext) {
+                return _dbContext.Users.Skip (pageSize * (page - 1)).Take (pageSize).ToList ();
+            }
+        }
+
+        public int FixAge () {
+            using (_dbContext) {
+                using (var transaction = _dbContext.Database.BeginTransaction ()) {
+                    try {
+                        var userListForm = _dbContext.Users.Where (x =&gt; x.Age &lt; 0);
+                        foreach (UserEntity user in userListForm) {
+                            user.Age = 0;
+                        }
+                        var count = _dbContext.SaveChanges ();
+                        transaction.Commit ();
+                        return count;
+                    } catch (Exception ex) {
+                        transaction.Rollback ();
+                        return 0;
+                    }
+                }
+            }
+        }
+
+    }
+}</code></pre><h3 id="2-テスト用のAPI-Controllerの作成"><a href="#2-テスト用のAPI-Controllerの作成" class="headerlink" title="2. テスト用のAPI Controllerの作成"></a>2. テスト用のAPI Controllerの作成</h3><p>ControllersフォルダにEfCoreController.csを作成します。</p><pre><code class="cs">using ds.Tutorial.web.Models;
+using ds.Tutorial.web.Repositories;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers {
+    public class EfCoreController : Controller {
+        private TutorialRepository _repository;
+
+        public EfCoreController (TutorialRepository repository) {
+            _repository = repository;
+        }
+
+        public IActionResult Create (UserEntity user) {
+            var message = _repository.Create (user) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message, User = user });
+        }
+
+        public IActionResult Update (UserEntity user) {
+            var message = _repository.Update (user) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message, User = user });
+        }
+
+        public IActionResult Delete (int id) {
+            var message = _repository.Delete (id) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message });
+        }
+
+        public IActionResult GetOneById (int id) {
+            var user = _repository.GetOneById (id);
+            return Json (new { User = user });
+        }
+
+        public IActionResult GetAllByAge (int age) {
+            var users = _repository.GetAllByAge (age);
+            return Json (new { User = users });
+        }
+
+        public IActionResult GetNamesByAge (int age) {
+            var names = _repository.GetNamesByAge (age);
+            return Json (new { Names = names });
+        }
+
+        public IActionResult GetAllPaging (int pageSize, int page) {
+            var users = _repository.GetAllPaging (pageSize, page);
+            return Json (new { Users = users });
+        }
+
+        public IActionResult FixAge () {
+            var count = _repository.FixAge ();
+            return Json (new { FixCount = count });
+        }
+
+    }
+}</code></pre><h3 id="3-疎通テスト"><a href="#3-疎通テスト" class="headerlink" title="3. 疎通テスト"></a>3. 疎通テスト</h3><h4 id="Startup-csにてrepositoryを注入"><a href="#Startup-csにてrepositoryを注入" class="headerlink" title="Startup.csにてrepositoryを注入"></a>Startup.csにてrepositoryを注入</h4><pre><code class="cs">public void ConfigureServices (IServiceCollection services) {
+    services.AddTransient&lt;TutorialRepository&gt; ();
+}</code></pre><h4 id="アプリ起動＆テスト"><a href="#アプリ起動＆テスト" class="headerlink" title="アプリ起動＆テスト"></a>アプリ起動＆テスト</h4><p>アプリを起動し、以下のURLに対してアクセスを行う。</p><table><thead><tr><th>API</th><th>ルート</th></tr></thead><tbody><tr><td>登録</td><td>/efcore/create?name=dongsu&amp;age=18&amp;hobby=coding</td></tr><tr><td>削除</td><td>/efcore/delete?id=2</td></tr><tr><td>更新</td><td>/efcore/update?id=1&amp;name=dongsu&amp;age=30&amp;hobby=codingOrWorkout</td></tr><tr><td>idからユーザーを取得</td><td>/efcore/getonebyid?id=1</td></tr><tr><td>年齢からユーザー一覧を取得</td><td>/efcore/getallbyage?age=30</td></tr><tr><td>年齢からユーザー名一覧を取得</td><td>/efcore/getnamesbyage?age=31</td></tr><tr><td>該当ページングのユーザー一覧を取得</td><td>/efcore/getallpaging?pagesize=3&amp;page=1</td></tr><tr><td>年齢がマイナス値のユーザーを0に変更</td><td>/efcore/fixage</td></tr></tbody></table><h2 id="EF-Core-生SQLの操作方法"><a href="#EF-Core-生SQLの操作方法" class="headerlink" title="EF Core + 生SQLの操作方法"></a>EF Core + 生SQLの操作方法</h2><p>EF Coreを使う以上、基本Linqを使ってDB操作したほうが生産性高いですが、<br>要件によって複雑なSQLを書く場合もあります。</p><p>生SQLでの操作方法は以下に記述します。</p><h3 id="1-リポジトリ作成-1"><a href="#1-リポジトリ作成-1" class="headerlink" title="1. リポジトリ作成"></a>1. リポジトリ作成</h3><p>RepositoriesのフォルダにTutorialWithSqlRepository.csを作成します。</p><pre><code class="cs">using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using ds.Tutorial.web.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace ds.Tutorial.web.Repositories {
+    public class TutorialWithSqlRepository {
+        private TutorialDbContext _dbContext;
+
+        public TutorialWithSqlRepository (TutorialDbContext dbContext) {
+            _dbContext = dbContext;
+        }
+
+        public int Create (UserEntity user) {
+            using (var connection = _dbContext.Database.GetDbConnection ()) {
+                connection.Open ();
+                var command = connection.CreateCommand ();
+                command.CommandText = &quot;insert into [dbo].[user] (name,age,hobby) values (@name,@age,@hobby)&quot;;
+
+                command.Parameters.Add (new SqlParameter () {
+                    ParameterName = &quot;@name&quot;,
+                        DbType = DbType.String,
+                        Value = user.Name
+                });
+
+                command.Parameters.Add (new SqlParameter () {
+                    ParameterName = &quot;@age&quot;,
+                        DbType = DbType.Int32,
+                        Value = user.Age
+                });
+
+                command.Parameters.Add (new SqlParameter () {
+                    ParameterName = &quot;@hobby&quot;,
+                        DbType = DbType.String,
+                        Value = user.Hobby
+                });
+
+                var count = command.ExecuteNonQuery ();
+                command.CommandText = &quot;select top(1) id from [dbo].[user] order by id desc&quot;;
+                user.Id = (int) command.ExecuteScalar ();
+
+                return count;
+            }
+        }
+
+        public int Update (UserEntity user) {
+            using (_dbContext) {
+                return _dbContext.Database.ExecuteSqlCommand (
+                    &quot;update [dbo].[user] set name={0}, age={1}, hobby={2} where id={3}&quot;,
+                    user.Name, user.Age, user.Hobby, user.Id
+                );
+            }
+        }
+
+        public int Delete (int id) {
+            using (_dbContext) {
+                return _dbContext.Database.ExecuteSqlCommand (
+                    &quot;delete from [dbo].[user] where id = {0}&quot;, id
+                );
+            }
+        }
+
+        public UserEntity GetOneById (int id) {
+            using (_dbContext) {
+                return _dbContext.Users.FromSql (&quot;select id, name, age, hobby from [dbo].[user] where id={0}&quot;, id).FirstOrDefault ();
+            }
+        }
+
+        public List&lt;UserEntity&gt; GetAllByAge (int age) {
+            using (_dbContext) {
+                return _dbContext.Users.FromSql (&quot;select id, name, age, hobby from [dbo].[user] where age={0}&quot;, age).ToList ();
+            }
+        }
+
+        public List&lt;string&gt; GetNamesByAge (int age) {
+            using (_dbContext) {
+                return _dbContext.Users.FromSql (&quot;select id, name from [dbo].[user] where age={0}&quot;, age).Select (x =&gt; x.Name).ToList ();
+            }
+        }
+
+        public List&lt;UserEntity&gt; GetAllPaging (int pageSize, int page) {
+            using (_dbContext) {
+                return _dbContext.Users
+                    .FromSql (&quot;select id, name, age, hobby from [dbo].[user] order by id offset {0} rows fetch next {1} rows only&quot;, pageSize * (page - 1), pageSize)
+                    .ToList ();
+            }
+        }
+
+        public int FixAge () {
+            using (_dbContext) {
+                using (var connection = _dbContext.Database.GetDbConnection ()) {
+                    connection.Open ();
+                    using (var transaction = connection.BeginTransaction ()) {
+                        try {
+                            var command = connection.CreateCommand ();
+                            command.Transaction = transaction;
+                            command.CommandText = &quot;update [dbo].[user] set age = @age where age&lt;@age&quot;;
+
+                            command.Parameters.Add (new SqlParameter () {
+                                ParameterName = &quot;@age&quot;,
+                                    DbType = DbType.Int32,
+                                    Value = 0
+                            });
+
+                            var count = command.ExecuteNonQuery ();
+                            transaction.Commit ();
+                            return count;
+                        } catch (Exception ex) {
+                            connection.Close ();
+                            transaction.Rollback ();
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+}</code></pre><h3 id="2-テスト用のAPI-Controllerの作成-1"><a href="#2-テスト用のAPI-Controllerの作成-1" class="headerlink" title="2. テスト用のAPI Controllerの作成"></a>2. テスト用のAPI Controllerの作成</h3><p>ControllersフォルダにEfCoreWithSqlController.csを作成します。</p><pre><code class="cs">using System;
+using ds.Tutorial.web.Models;
+using ds.Tutorial.web.Repositories;
+using Microsoft.AspNetCore.Mvc;
+
+namespace ds.Tutorial.web.Controllers {
+    public class EfCoreWithSqlController : Controller {
+        private TutorialWithSqlRepository _repository;
+
+        public EfCoreWithSqlController (TutorialWithSqlRepository repository) {
+            _repository = repository;
+        }
+
+        public IActionResult Create (UserEntity user) {
+            var message = _repository.Create (user) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message, User = user });
+        }
+
+        public IActionResult Update (UserEntity user) {
+            var message = _repository.Update (user) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message, User = user });
+        }
+
+        public IActionResult Delete (int id) {
+            var message = _repository.Delete (id) &gt; 0 ? &quot;ok&quot; : &quot;ng&quot;;
+            return Json (new { Message = message });
+        }
+
+        public IActionResult GetOneById (int id) {
+            var user = _repository.GetOneById (id);
+            return Json (new { User = user });
+        }
+
+        public IActionResult GetAllByAge (int age) {
+            var users = _repository.GetAllByAge (age);
+            return Json (new { User = users });
+        }
+
+        public IActionResult GetNamesByAge (int age) {
+            var names = _repository.GetNamesByAge (age);
+            return Json (new { Names = names });
+        }
+
+        public IActionResult GetAllPaging (int pageSize, int page) {
+            var users = _repository.GetAllPaging (pageSize, page);
+            return Json (new { Users = users });
+        }
+
+        public IActionResult FixAge () {
+            var count = _repository.FixAge ();
+            return Json (new { FixCount = count });
+        }
+
+    }
+}</code></pre><h3 id="3-疎通テスト-1"><a href="#3-疎通テスト-1" class="headerlink" title="3. 疎通テスト"></a>3. 疎通テスト</h3><h4 id="Startup-csにてrepositoryを注入-1"><a href="#Startup-csにてrepositoryを注入-1" class="headerlink" title="Startup.csにてrepositoryを注入"></a>Startup.csにてrepositoryを注入</h4><pre><code class="cs">public void ConfigureServices (IServiceCollection services) {
+    services.AddTransient&lt;TutorialWithSqlRepository&gt; ();
+}</code></pre><h4 id="アプリ起動＆テスト-1"><a href="#アプリ起動＆テスト-1" class="headerlink" title="アプリ起動＆テスト"></a>アプリ起動＆テスト</h4><p>アプリを起動し、以下のURLに対してアクセスを行う。</p><table><thead><tr><th>API</th><th>ルート</th></tr></thead><tbody><tr><td>登録</td><td>/efcorewithsql/create?name=dongsu&amp;age=18&amp;hobby=coding</td></tr><tr><td>削除</td><td>/efcorewithsql/delete?id=2</td></tr><tr><td>更新</td><td>/efcorewithsql/update?id=1&amp;name=dongsu&amp;age=30&amp;hobby=codingOrWorkout</td></tr><tr><td>idからユーザーを取得</td><td>/efcorewithsql/getonebyid?id=1</td></tr><tr><td>年齢からユーザー一覧を取得</td><td>/efcorewithsql/getallbyage?age=30</td></tr><tr><td>年齢からユーザー名一覧を取得</td><td>/efcorewithsql/getnamesbyage?age=31</td></tr><tr><td>該当ページングのユーザー一覧を取得</td><td>/efcorewithsql/getallpaging?pagesize=3&amp;page=1</td></tr><tr><td>年齢がマイナス値のユーザーを0に変更</td><td>/efcorewithsql/fixage</td></tr></tbody></table><h2 id="備考"><a href="#備考" class="headerlink" title="備考"></a>備考</h2><p>今回作成したソースコードです。</p><p><a href="https://github.com/dongsu-iis/Learn-AspNetCore/tree/master/ds.Tutorial" target="_blank" rel="noopener">GitHubリポジトリ</a></p><p>では！！( ｀ー´)ノ</p></section></article><section class="prev-next card slide-in-right"><a href="/2019/10/07/asp_net_core_mvc/basic/chap09/" class="link prev" title="ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ"><span class="hover-underline-animation">&larr; ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ</span> </a><a href="/2019/09/27/asp_net_core_mvc/basic/chap07/" class="link next" title="ASP.NET Core 入門7 ASP.NET Core MVC 部分ビュー"><span class="hover-underline-animation">ASP.NET Core 入門7 ASP.NET Core MVC 部分ビュー &rarr;</span></a></section><section class="article-toc"><div class="card"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提"><span class="toc-text">前提</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-このコンテンツを扱うこと"><span class="toc-text">1. このコンテンツを扱うこと</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-環境情報"><span class="toc-text">2. 環境情報</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-事前準備"><span class="toc-text">3. 事前準備</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-前提知識"><span class="toc-text">4. 前提知識</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EF-Core-SQL-Serverの導入＆接続準備"><span class="toc-text">EF Core + SQL Serverの導入＆接続準備</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-EF-Core-SQLserver-Provide導入"><span class="toc-text">1. EF Core + SQLserver Provide導入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-DBとテーブル作成"><span class="toc-text">2. DBとテーブル作成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#データベース作成"><span class="toc-text">データベース作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#テーブル作成"><span class="toc-text">テーブル作成</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-接続文字列を作成"><span class="toc-text">3. 接続文字列を作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-EntityとDbContextを作成"><span class="toc-text">4. EntityとDbContextを作成</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Entity作成"><span class="toc-text">Entity作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#DbContext作成"><span class="toc-text">DbContext作成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Startup-csを修正"><span class="toc-text">Startup.csを修正</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EF-Core-Linq-to-Entityの操作方法"><span class="toc-text">EF Core + Linq to Entityの操作方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-リポジトリ作成"><span class="toc-text">1. リポジトリ作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-テスト用のAPI-Controllerの作成"><span class="toc-text">2. テスト用のAPI Controllerの作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-疎通テスト"><span class="toc-text">3. 疎通テスト</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Startup-csにてrepositoryを注入"><span class="toc-text">Startup.csにてrepositoryを注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#アプリ起動＆テスト"><span class="toc-text">アプリ起動＆テスト</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#EF-Core-生SQLの操作方法"><span class="toc-text">EF Core + 生SQLの操作方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-リポジトリ作成-1"><span class="toc-text">1. リポジトリ作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-テスト用のAPI-Controllerの作成-1"><span class="toc-text">2. テスト用のAPI Controllerの作成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-疎通テスト-1"><span class="toc-text">3. 疎通テスト</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Startup-csにてrepositoryを注入-1"><span class="toc-text">Startup.csにてrepositoryを注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#アプリ起動＆テスト-1"><span class="toc-text">アプリ起動＆テスト</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#備考"><span class="toc-text">備考</span></a></li></ol></div><div class="card home-link"><a class="hover-underline-animation" href="/">&leftarrow; 戻るホーム</a></div></section><section class="article slide-in-right"><div class="loader" id="loader"><svg viewBox="0 0 50 50"><circle class="ring" cx="25" cy="25" r="20"></circle><circle class="ball" cx="25" cy="5" r="3.5"></circle></svg></div><div class="comment" id="utteranc"></div><noscript>Please activate JavaScript for normal use of comments</noscript></section><a class="card back-to-top" id="backTop">&UpArrow;</a></main><script>window.COLD_STONE={root:"/",author:"dongsu",gaid:"UA-148723572-1",repo:"dongsu-iis/dongsu-iis.github.io"}</script><script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.9/highlight.min.js"></script><script>hljs.initHighlightingOnLoad()</script><script src="/scripts/busuanzi.js" referrerpolicy="origin"></script><script src="/scripts/cold-stone.js"></script><script src="//www.googletagmanager.com/gtag/js?id=UA-148723572-1"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config",window.COLD_STONE.gaid)</script></body></html>
