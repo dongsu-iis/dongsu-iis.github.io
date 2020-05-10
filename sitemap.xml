@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://dongsu.dev/2019/09/10/asp_net_core_mvc/dotnet_portability_analysis/</loc>
+    <loc>https://dongsu.dev/2019/09/17/asp_net_core_mvc/dotnet_bundle/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/09/17/asp_net_core_mvc/dotnet_bundle/</loc>
+    <loc>https://dongsu.dev/2019/09/10/asp_net_core_mvc/dotnet_portability_analysis/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
@@ -23,14 +23,14 @@
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/07/25/other/gitea_create/</loc>
+    <loc>https://dongsu.dev/2018/08/04/other/coding_forever/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2018/08/04/other/coding_forever/</loc>
+    <loc>https://dongsu.dev/2019/07/25/other/gitea_create/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
@@ -72,14 +72,14 @@
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/10/23/asp_net_core_mvc/TieredArchitecture/chap1/</loc>
+    <loc>https://dongsu.dev/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/</loc>
+    <loc>https://dongsu.dev/2019/10/23/asp_net_core_mvc/TieredArchitecture/chap1/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
@@ -121,7 +121,7 @@
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/09/27/asp_net_core_mvc/basic/chap07/</loc>
+    <loc>https://dongsu.dev/2019/09/11/asp_net_core_mvc/basic/chap05/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
@@ -135,21 +135,21 @@
   </url>
   
   <url>
-    <loc>https://dongsu.dev/2019/10/01/asp_net_core_mvc/basic/chap08/</loc>
-    
-    <lastmod>2020-05-10T11:00:08.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://dongsu.dev/2019/09/11/asp_net_core_mvc/basic/chap05/</loc>
-    
-    <lastmod>2020-05-10T11:00:08.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://dongsu.dev/2019/10/07/asp_net_core_mvc/basic/chap09/</loc>
+    
+    <lastmod>2020-05-10T11:00:08.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://dongsu.dev/2019/09/27/asp_net_core_mvc/basic/chap07/</loc>
+    
+    <lastmod>2020-05-10T11:00:08.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://dongsu.dev/2019/10/01/asp_net_core_mvc/basic/chap08/</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
@@ -170,14 +170,14 @@
   </url>
   
   <url>
-    <loc>https://dongsu.dev/projects/index.html</loc>
+    <loc>https://dongsu.dev/tags/index.html</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://dongsu.dev/tags/index.html</loc>
+    <loc>https://dongsu.dev/projects/index.html</loc>
     
     <lastmod>2020-05-10T11:00:08.000Z</lastmod>
     
