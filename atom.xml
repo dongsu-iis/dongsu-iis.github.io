@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>dongsuの技術Blog</title>
+  <icon>https://dongsu.dev/avatar.jpg</icon>
+  <subtitle>Husband | Father | Engineer | Developer | SIer</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://dongsu.dev/"/>
+  <updated>2020-05-09T15:00:00.000Z</updated>
+  <id>https://dongsu.dev/</id>
+  
+  <author>
+    <name>dongsu</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Angular学習まとめ</title>
+    <link href="https://dongsu.dev/2020/05/10/angular/get-started/"/>
+    <id>https://dongsu.dev/2020/05/10/angular/get-started/</id>
+    <published>2020-05-09T15:00:00.000Z</published>
+    <updated>2020-05-09T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;モダンのフロントを開発できるようになりたいため、Angular学習をし始めました。&lt;br&gt;公式ドキュメントとチュートリアル、オンラインコースを一通り遊んだので、学習した内容をまとめたいと思います。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="フロントエンド" scheme="https://dongsu.dev/categories/%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term="Angular" scheme="https://dongsu.dev/tags/Angular/"/>
+    
+      <category term="TypeScript" scheme="https://dongsu.dev/tags/TypeScript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ベンダー資格は時間と金の無駄</title>
+    <link href="https://dongsu.dev/2020/03/08/other/shikaku2/"/>
+    <id>https://dongsu.dev/2020/03/08/other/shikaku2/</id>
+    <published>2020-03-07T15:00:00.000Z</published>
+    <updated>2020-03-07T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;以前、&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="随筆" scheme="https://dongsu.dev/categories/%E9%9A%8F%E7%AD%86/"/>
+    
+    
+      <category term="むしゃくしゃした" scheme="https://dongsu.dev/tags/%E3%82%80%E3%81%97%E3%82%83%E3%81%8F%E3%81%97%E3%82%83%E3%81%97%E3%81%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ソフトウェア開発の銀の弾丸 - DevOps</title>
+    <link href="https://dongsu.dev/2020/03/01/other/devops_20200301/"/>
+    <id>https://dongsu.dev/2020/03/01/other/devops_20200301/</id>
+    <published>2020-02-29T15:00:00.000Z</published>
+    <updated>2020-02-29T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;まずはこの図を見てください。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="随筆" scheme="https://dongsu.dev/categories/%E9%9A%8F%E7%AD%86/"/>
+    
+    
+      <category term="アジャイル" scheme="https://dongsu.dev/tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB/"/>
+    
+      <category term="Azure DevOps" scheme="https://dongsu.dev/tags/Azure-DevOps/"/>
+    
+      <category term="DevOps" scheme="https://dongsu.dev/tags/DevOps/"/>
+    
+      <category term="松屋" scheme="https://dongsu.dev/tags/%E6%9D%BE%E5%B1%8B/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>【読書メモ】The Art Of Unit Testing 2nd Edition - まとめ</title>
+    <link href="https://dongsu.dev/2020/01/23/aout2/conclusion/"/>
+    <id>https://dongsu.dev/2020/01/23/aout2/conclusion/</id>
+    <published>2020-01-22T15:00:00.000Z</published>
+    <updated>2020-01-22T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;１ヶ月ぶりにBlogを更新します。&lt;/p&gt;&lt;p&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="テスト技法" scheme="https://dongsu.dev/categories/%E3%83%86%E3%82%B9%E3%83%88%E6%8A%80%E6%B3%95/"/>
+    
+    
+      <category term="単体テスト" scheme="https://dongsu.dev/tags/%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>【読書メモ】The Art Of Unit Testing 2nd Edition - Chap3～Chap5</title>
+    <link href="https://dongsu.dev/2019/12/18/aout2/chap3-5/"/>
+    <id>https://dongsu.dev/2019/12/18/aout2/chap3-5/</id>
+    <published>2019-12-17T15:00:00.000Z</published>
+    <updated>2019-12-17T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="テスト技法" scheme="https://dongsu.dev/categories/%E3%83%86%E3%82%B9%E3%83%88%E6%8A%80%E6%B3%95/"/>
+    
+    
+      <category term="単体テスト" scheme="https://dongsu.dev/tags/%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+      <category term="NUnit" scheme="https://dongsu.dev/tags/NUnit/"/>
+    
+      <category term="NSubstitute" scheme="https://dongsu.dev/tags/NSubstitute/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>【読書メモ】The Art Of Unit Testing 2nd Edition - Chap2</title>
+    <link href="https://dongsu.dev/2019/12/08/aout2/chap2/"/>
+    <id>https://dongsu.dev/2019/12/08/aout2/chap2/</id>
+    <published>2019-12-07T15:00:00.000Z</published>
+    <updated>2019-12-07T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="テスト技法" scheme="https://dongsu.dev/categories/%E3%83%86%E3%82%B9%E3%83%88%E6%8A%80%E6%B3%95/"/>
+    
+    
+      <category term="単体テスト" scheme="https://dongsu.dev/tags/%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+      <category term="NUnit" scheme="https://dongsu.dev/tags/NUnit/"/>
+    
+      <category term="むしゃくしゃした" scheme="https://dongsu.dev/tags/%E3%82%80%E3%81%97%E3%82%83%E3%81%8F%E3%81%97%E3%82%83%E3%81%97%E3%81%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>PC最速セットアップ手順</title>
+    <link href="https://dongsu.dev/2019/12/04/other/pcsetup/"/>
+    <id>https://dongsu.dev/2019/12/04/other/pcsetup/</id>
+    <published>2019-12-03T15:00:00.000Z</published>
+    <updated>2019-12-03T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;最悪、PCが不具合あるので仕方ないOS再インストールになりました。&lt;/p&gt;&lt;p&gt;この手順なら半日で開発環境の構築も含めて終わらせることができそう。&lt;/p&gt;&lt;h2 id=&quot;バックアップ&quot;&gt;&lt;a href=&quot;#バックアップ&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="随筆" scheme="https://dongsu.dev/categories/%E9%9A%8F%E7%AD%86/"/>
+    
+    
+      <category term="日常生活" scheme="https://dongsu.dev/tags/%E6%97%A5%E5%B8%B8%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Clean Architecture Memo</title>
+    <link href="https://dongsu.dev/2019/12/03/architecture/clean_architecture_memo/"/>
+    <id>https://dongsu.dev/2019/12/03/architecture/clean_architecture_memo/</id>
+    <published>2019-12-02T15:00:00.000Z</published>
+    <updated>2019-12-02T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;久しぶりに&lt;a href=&quot;https://dev.to/ivanpaulovich/clean-architecture-essentials-5a0m&quot; target=&quot;_blank&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="アーキテクチャ" scheme="https://dongsu.dev/categories/%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3/"/>
+    
+    
+      <category term="アジャイル" scheme="https://dongsu.dev/tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB/"/>
+    
+      <category term="設計" scheme="https://dongsu.dev/tags/%E8%A8%AD%E8%A8%88/"/>
+    
+      <category term="テスト" scheme="https://dongsu.dev/tags/%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>少しデバッグが便利になるSQL ServerのOUTPUT句を紹介</title>
+    <link href="https://dongsu.dev/2019/11/28/other/sql_output/"/>
+    <id>https://dongsu.dev/2019/11/28/other/sql_output/</id>
+    <published>2019-11-27T15:00:00.000Z</published>
+    <updated>2019-11-27T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;自分への備忘録です。&lt;/p&gt;&lt;p&gt;SQL
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term="SQL" scheme="https://dongsu.dev/tags/SQL/"/>
+    
+      <category term="SQL Server" scheme="https://dongsu.dev/tags/SQL-Server/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>WSL + Docker + Jenkins + Proxyの地雷を解決する</title>
+    <link href="https://dongsu.dev/2019/11/18/other/wsl_docker_jenkins/"/>
+    <id>https://dongsu.dev/2019/11/18/other/wsl_docker_jenkins/</id>
+    <published>2019-11-17T15:00:00.000Z</published>
+    <updated>2019-11-17T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;WSLのDockerでJenkinsを動かしてみようと思い、軽い気持ちで&lt;code&gt;docker-compose up
+        
+      
+    
+    </summary>
+    
+    
+      <category term="インフラ" scheme="https://dongsu.dev/categories/%E3%82%A4%E3%83%B3%E3%83%95%E3%83%A9/"/>
+    
+    
+      <category term="Docker" scheme="https://dongsu.dev/tags/Docker/"/>
+    
+      <category term="Proxy" scheme="https://dongsu.dev/tags/Proxy/"/>
+    
+      <category term="WSL" scheme="https://dongsu.dev/tags/WSL/"/>
+    
+      <category term="Spring Boot" scheme="https://dongsu.dev/tags/Spring-Boot/"/>
+    
+      <category term="Jenkins" scheme="https://dongsu.dev/tags/Jenkins/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>キレイなSpring Bootの開発環境を構築する(WSL + Proxy + vscode)</title>
+    <link href="https://dongsu.dev/2019/11/13/spring/wsl_spring/"/>
+    <id>https://dongsu.dev/2019/11/13/spring/wsl_spring/</id>
+    <published>2019-11-12T15:00:00.000Z</published>
+    <updated>2019-11-12T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;Spring
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term="Proxy" scheme="https://dongsu.dev/tags/Proxy/"/>
+    
+      <category term="WSL" scheme="https://dongsu.dev/tags/WSL/"/>
+    
+      <category term="vscode" scheme="https://dongsu.dev/tags/vscode/"/>
+    
+      <category term="Java" scheme="https://dongsu.dev/tags/Java/"/>
+    
+      <category term="Spring Boot" scheme="https://dongsu.dev/tags/Spring-Boot/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core MVC 階層化アーキテクチャ Chap4 (データアクセスオブジェクトを抜き出しModel層を作成する)</title>
+    <link href="https://dongsu.dev/2019/11/12/asp_net_core_mvc/TieredArchitecture/chap4/"/>
+    <id>https://dongsu.dev/2019/11/12/asp_net_core_mvc/TieredArchitecture/chap4/</id>
+    <published>2019-11-11T15:00:00.000Z</published>
+    <updated>2019-11-11T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;前回のコンテンツ&lt;a href=&quot;https://dongsu.dev/2019/11/05/asp_net_core_mvc/TieredArchitecture/chap3/&quot;&gt;ASP.NET Core MVC 階層化アーキテクチャ
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>【読書メモ】The Art Of Unit Testing 2nd Edition - Chap1</title>
+    <link href="https://dongsu.dev/2019/11/11/aout2/chap1/"/>
+    <id>https://dongsu.dev/2019/11/11/aout2/chap1/</id>
+    <published>2019-11-10T15:00:00.000Z</published>
+    <updated>2019-11-10T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;自分用の読書用振り返りのメモです。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="テスト技法" scheme="https://dongsu.dev/categories/%E3%83%86%E3%82%B9%E3%83%88%E6%8A%80%E6%B3%95/"/>
+    
+    
+      <category term="単体テスト" scheme="https://dongsu.dev/tags/%E5%8D%98%E4%BD%93%E3%83%86%E3%82%B9%E3%83%88/"/>
+    
+      <category term="アジャイル" scheme="https://dongsu.dev/tags/%E3%82%A2%E3%82%B8%E3%83%A3%E3%82%A4%E3%83%AB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>プロジェクトマネージャーはコーディングすべきか?</title>
+    <link href="https://dongsu.dev/2019/11/09/other/leader_coding/"/>
+    <id>https://dongsu.dev/2019/11/09/other/leader_coding/</id>
+    <published>2019-11-08T15:00:00.000Z</published>
+    <updated>2019-11-08T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;今日は技術の話ではなく管理について話したいと思います。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="随筆" scheme="https://dongsu.dev/categories/%E9%9A%8F%E7%AD%86/"/>
+    
+    
+      <category term="考えてみた" scheme="https://dongsu.dev/tags/%E8%80%83%E3%81%88%E3%81%A6%E3%81%BF%E3%81%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core MVC 階層化アーキテクチャ Chap3 (個別Repositoryで独自処理を実装する)</title>
+    <link href="https://dongsu.dev/2019/11/05/asp_net_core_mvc/TieredArchitecture/chap3/"/>
+    <id>https://dongsu.dev/2019/11/05/asp_net_core_mvc/TieredArchitecture/chap3/</id>
+    <published>2019-11-04T15:00:00.000Z</published>
+    <updated>2019-11-04T15:00:00.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;前回のコンテンツ&lt;a href=&quot;https://dongsu.dev/2019/10/30/asp_net_core_mvc/TieredArchitecture/chap2/&quot;&gt;ASP.NET Core MVC 階層化アーキテクチャ
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core MVC 階層化アーキテクチャ Chap2 (Generic Repositoryで共通化を図る)</title>
+    <link href="https://dongsu.dev/2019/10/30/asp_net_core_mvc/TieredArchitecture/chap2/"/>
+    <id>https://dongsu.dev/2019/10/30/asp_net_core_mvc/TieredArchitecture/chap2/</id>
+    <published>2019-10-29T15:00:00.000Z</published>
+    <updated>2020-05-10T11:00:08.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;&lt;a href=&quot;https://dongsu.dev/2019/10/23/asp_net_core_mvc/TieredArchitecture/chap1/&quot;&gt;前回&lt;/a&gt;を通じて、&lt;code&gt;ASP.NET Core
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core MVC 階層化アーキテクチャ Chap1 (Repository Patternを実装する)</title>
+    <link href="https://dongsu.dev/2019/10/23/asp_net_core_mvc/TieredArchitecture/chap1/"/>
+    <id>https://dongsu.dev/2019/10/23/asp_net_core_mvc/TieredArchitecture/chap1/</id>
+    <published>2019-10-22T15:00:00.000Z</published>
+    <updated>2020-05-10T11:00:08.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;最近プライベートでバタバタしていて、ブログの更新を疎かになってしまいました。久しぶりに&lt;code&gt;ASP.NET Core MVC&lt;/code&gt; のシリーズの続きを書きます。&lt;/p&gt;&lt;p&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Libmanのプロキシ経由接続</title>
+    <link href="https://dongsu.dev/2019/10/15/other/libman_proxy/"/>
+    <id>https://dongsu.dev/2019/10/15/other/libman_proxy/</id>
+    <published>2019-10-14T15:00:00.000Z</published>
+    <updated>2020-05-10T11:00:08.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;またまた社内認証プロキシによって躓きましたので、解決策を備忘として記載します。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="フロントエンド" scheme="https://dongsu.dev/categories/%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+      <category term="Libman" scheme="https://dongsu.dev/tags/Libman/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core MVC 階層化アーキテクチャ Chap0 (ScaffoldからC.R.U.D操作を理解する)</title>
+    <link href="https://dongsu.dev/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/"/>
+    <id>https://dongsu.dev/2019/10/09/asp_net_core_mvc/TieredArchitecture/chap0/</id>
+    <published>2019-10-08T15:00:00.000Z</published>
+    <updated>2020-05-10T11:00:08.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;&lt;code&gt;ASP.NET Core MVC&lt;/code&gt; を用いて開発する際に、間違った実装方法をする人をときどきみかけます。&lt;/p&gt;&lt;p&gt;確かに&lt;code&gt;ASP.NET Core MVC&lt;/code&gt; はJavaのSpring
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ASP.NET Core 入門9 ASP.NET Core MVCをCentOS 7へデプロイ</title>
+    <link href="https://dongsu.dev/2019/10/07/asp_net_core_mvc/basic/chap09/"/>
+    <id>https://dongsu.dev/2019/10/07/asp_net_core_mvc/basic/chap09/</id>
+    <published>2019-10-06T15:00:00.000Z</published>
+    <updated>2020-05-10T11:00:08.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;a id=&quot;more&quot;&gt;&lt;/a&gt;&lt;p&gt;&lt;code&gt;ASP.NET Core&lt;/code&gt; はWindowsのみではなく、Linux上でも動作します。今回は今まで作成したソースコードをCentOS7上に乗せて動作するまでを行います。&lt;/p&gt;&lt;p&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+    
+      <category term="バックエンド" scheme="https://dongsu.dev/categories/%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89/"/>
+    
+    
+      <category term=".NET Core" scheme="https://dongsu.dev/tags/NET-Core/"/>
+    
+      <category term="ASP.NET MVC" scheme="https://dongsu.dev/tags/ASP-NET-MVC/"/>
+    
+      <category term="ASP.NET Core" scheme="https://dongsu.dev/tags/ASP-NET-Core/"/>
+    
+      <category term="CentOS" scheme="https://dongsu.dev/tags/CentOS/"/>
+    
+  </entry>
+  
+</feed>
